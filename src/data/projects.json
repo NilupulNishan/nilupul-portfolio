@@ -1,0 +1,32 @@
+[
+    {
+      "title": "Venomverse App (Group Project)",
+      "description": "Developed an App to identifiying snakes, spiders and insects via images and show their details",
+      "skills": ["Flutter", "Firebase", "inception v3"],
+      "source": "https://github.com/PulinduYK/VenomVerseApp"
+    },
+    {
+      "title": "Personal Portfolio",
+      "description": "Designed a personal portfolio website to showcase my projects and skills.",
+      "skills": ["React", "CSS"],
+      "source": "https://www.github.com"
+    },
+    {
+      "title": "No More Hunger SDG Website",
+      "description": "Developed an interactive website promoting the UN's 'Zero Hunger' goal.",
+      "skills": ["HTML", "CSS", "JavaScript"],
+      "source": "https://www.github.com"
+    },
+    {
+      "title": "Plane Seat Management System",
+      "description": "Designed a seat reservation system for a private aviation company.",
+      "skills": ["Java"],
+      "source": "https://www.github.com"
+    },
+    {
+        "title": "Academic Progression Prediction System ",
+        "description": "Developed a modular application to predict university students' academic progression.",
+        "skills": ["Python"],
+        "source": "https://www.github.com"
+    }
+  ]

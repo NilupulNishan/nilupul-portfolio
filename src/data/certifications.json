@@ -1,0 +1,80 @@
+[
+    {
+      "title": "Git Essential Training",
+      "skills": ["Git"],
+      "date": "Jan 2025",
+      "link": "https://www.linkedin.com/learning/certificates/bcbdca0f1f3b8ea16694f1ff9f01580985abcb3c3dbf7cf04ae83228eda90fec?u=76664938"
+    },
+    {
+        "title": "Java Threads",
+        "skills": ["Java"],
+        "date": "Dec 2024",
+        "link": "https://www.linkedin.com/learning/certificates/0afc9c2967d0e7c27bc95c625056aa761ee0822f7ade09c2f503c42844f97c27?u=76664938"
+    },
+    {
+        "title": "MATLAB Essential Training",
+        "skills": ["Data Analysis", "MATLAB"],
+        "date": "Dec 2024",
+        "link": "https://www.linkedin.com/learning/certificates/fb2ad3d73a0aa1001979937f549d297810562dd2933e90f97a64bc101ab31281?u=76664938"
+    },
+    {
+        "title": "Java Object-Oriented Programming",
+        "skills": ["OOP", "Java"],
+        "date": "Nov 2024",
+        "link": "https://www.linkedin.com/learning/certificates/f5a6cbf8019335a1757cb84e73d973a34e3c13714026f6d26e4fae1267106c94?u=76664938"
+    },
+    {
+        "title": "Java Essential Training: Syntax and Structure",
+        "skills": ["Java"],
+        "date": "Sep 2024",
+        "link": "https://www.linkedin.com/learning/certificates/70c952231fcba31ed3724d74aca9e94584ef66d15dbc874fb64b34a5c25c1d36?u=76664938"
+    },
+    {
+        "title": "React.js Essential Training",
+        "skills": ["React.js"],
+        "date": "Jun 2024",
+        "link": "https://www.linkedin.com/learning/certificates/0cdb64d24c9cc46a4865f160efaccc3723cc21d48a8ea9d6c1f1eefda07134ee?u=76664938"
+    },
+    {
+        "title": "JavaScript Essential Training",
+        "skills": ["JavaScript"],
+        "date": "May 2024",
+        "link": "https://www.linkedin.com/learning/certificates/6df89e5c39fde631e7e28b439e7d2d4252443a11d739992bcd8d8bb55a7150d0?u=76664938"
+    },
+    {
+        "title": "Learning Java 17",
+        "skills": ["Java"],
+        "date": "Feb 2024",
+        "link": "https://www.linkedin.com/learning/certificates/0423a446176d78a98ae89d771d6652fdf0a80f86ac37773837e27f0a35b7355b?u=76664938"
+    },
+    {
+      "title": "Career Essentials in Software Development by Microsoft and LinkedIn",
+      "skills": ["Programming", "Software Development"],
+      "date": "Oct 2023",
+      "link": "https://www.linkedin.com/learning/certificates/c9d1b2c9136cfa89f0233f2b2562426bf0400c28ef3a2f9393d78c5b0bab6862?u=76664938"
+    },
+    {
+        "title": "Freelancing Foundations",
+        "skills": ["Freelancing"],
+        "date": "Oct 2023",
+        "link": "https://www.linkedin.com/learning/certificates/1afbfcfc85b92158a6511704e13b584d3797fe8b7005014f96f7510dff5e21a0?u=76664938"
+    },
+    {
+        "title": "HTML Essential Training",
+        "skills": ["HTML"],
+        "date": "Oct 2023",
+        "link": "https://www.linkedin.com/learning/certificates/0aff28109c93c4dbcb0e10a7f5cdaf044178f8264979e306d84a142f45d850b4?u=76664938"
+    },
+    {
+        "title": "Programming Foundations: Beyond the Fundamentals",
+        "skills": ["Programming"],
+        "date": "Oct 2023",
+        "link": "https://www.linkedin.com/learning/certificates/539c07c16c4ab9f6aa4052a7d7d03979c715c14875739c59b7dceefa2d3255e4?u=76664938"
+    },
+    {
+        "title": "Programming Foundations: Fundamentals",
+        "skills": ["Programming"],
+        "date": "Oct 2023",
+        "link": "https://www.linkedin.com/learning/certificates/f0e33f58da4aed1de18eef22092812bb9c54660fe04ca5e6c5779ae4f5944264?u=76664938"
+    }
+]

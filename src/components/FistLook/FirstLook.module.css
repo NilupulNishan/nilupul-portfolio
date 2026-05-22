@@ -1,0 +1,199 @@
+@import "../../vars.css";
+
+.container{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 5%;
+    z-index: 1;
+    margin-left: 5%;
+    margin-right: 5%;
+
+}
+
+.content{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: var(--color-text);
+    z-index: 1;
+}
+
+.title{
+    font-size: 3.5rem;
+    font-weight: 900;
+    font-family: var(--font-primary);
+    color: white;
+}
+.name{
+    font-size: 4.5rem;
+    font-weight: 900;
+    font-family: var(--font-primary);
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+.description{
+    font-size: 1.5rem;
+    font-weight: 400;
+    font-family: var(--font-primary);
+    margin-bottom: 1.5rem;
+    max-width: 100%;
+}
+.btns {
+    display: flex;
+    align-items: center;
+    justify-content: start; 
+    gap: 1.5rem; 
+    width: 100%;
+}
+.btn2{
+    margin-top: 1.5rem;
+}
+
+
+.contactBtn {
+    min-height: 3rem;
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: 900;
+    font-family: var(--font-primary);
+    background-color: var(--color-primary); 
+    color: var(--color-dark); 
+    padding: 1rem 2rem;
+    border: 3px solid var(--color-primary); 
+    border-radius: 2rem; 
+    display: inline-block; 
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.contactBtn:hover {
+    background-color: transparent; 
+    color: white; 
+}
+
+.iconBtn {
+    font-size: 1.5rem;
+    text-decoration: none;
+    font-weight: 900;
+    font-family: var(--font-primary);
+    background-color: transparent;
+    color: white;
+    width: 3rem;  
+    height: 3rem; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--color-primary); 
+    border-radius: 50%; 
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+.iconBtn:hover {
+    background-color: var(--color-primary); 
+    color: black; 
+}
+
+.contactBtn:focus-visible,
+.iconBtn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(138, 255, 35, 0.28);
+}
+.profilePic{
+    margin-top: -4.5%;
+    margin-left: 5%;
+    width: 40%;
+    z-index: 1;
+
+    animation-name: floating;
+    animation-duration: 3s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes floating {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(5px);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+.topBlur{
+    position: absolute;
+    width: 50vw;
+    height: 50vh;
+    top: -10vh;
+    left: -5vw;
+    background-color: rgba(25, 109, 73, 0.7); 
+    filter: blur(100px);
+    z-index: 0;
+}
+
+@media screen and (max-width: 950px){
+    .title{
+        font-size: 3rem;
+    }
+    .name{
+        font-size: 2.75rem;
+    }
+    .description{
+        font-size: 1.25rem;
+    }
+    
+}
+@media screen and (max-width: 768px){
+    .container{
+        margin-top: 10%;
+        flex-direction: column-reverse;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    .content{
+        align-items: center;
+        text-align: center;
+        margin-top: 2rem;
+    }
+    .btns{
+        justify-content: center;
+    }
+    .profilePic{
+        width: 60%;
+    }
+    .iconBtn , .contactBtn {
+        font-size: 1.25rem;
+    }
+    .title{
+        font-size: 3rem;
+    }
+    .name{
+        font-size: 2.5rem;
+    }
+    .description{
+        font-size: 1.25rem;
+    }
+    
+    
+}
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+    .profilePic{
+        animation: none;
+    }
+
+    .topBlur{
+        display: none;
+    }
+
+    .contactBtn,
+    .iconBtn {
+        transition-duration: 0.15s;
+    }
+}
+

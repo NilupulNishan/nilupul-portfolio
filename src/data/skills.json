@@ -1,0 +1,38 @@
+[
+    {
+        "title": "Java",
+        "imageSrc": "java.png"
+    },
+    {
+        "title": "Python",
+        "imageSrc": "python.png"
+    },
+    {
+      "title": "HTML",
+      "imageSrc": "html.png"
+    },
+    {
+      "title": "CSS",
+      "imageSrc": "css.png"
+    },
+    {
+      "title": "React",
+      "imageSrc": "react.png"
+    },
+    {
+      "title": "Node",
+      "imageSrc": "node.png"
+    },
+    {
+      "title": "Flutter",
+      "imageSrc": "flutter.png"
+    },
+    {
+      "title": "MySQL",
+      "imageSrc": "mysql.png"
+    },
+    {
+      "title": "Figma",
+      "imageSrc": "figma.png"
+    }
+  ]
