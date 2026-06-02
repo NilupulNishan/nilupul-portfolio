@@ -1,7 +1,7 @@
 /* global process */
 
 const GITHUB_GRAPHQL_ENDPOINT = 'https://api.github.com/graphql';
-const GITHUB_USERNAME = 'gurugetnm';
+const GITHUB_USERNAME = 'NilupulNishan';
 const CACHE_TTL_MS = 1000 * 60 * 60 * 3;
 
 let cachedResponse = null;
@@ -79,7 +79,7 @@ async function fetchContributionRange(token, from, to) {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'User-Agent': 'thevindu-guruge-portfolio',
+      'User-Agent': 'nilupul-nishan-portfolio',
     },
     body: JSON.stringify({
       query: contributionQuery,
@@ -208,7 +208,7 @@ export default async function handler(request, response) {
         })) || [],
       };
 
-      console.info('GitHub contribution repositories for gurugetnm:', repoBreakdown);
+      console.info('GitHub contribution repositories for NilupulNishan:', repoBreakdown);
     }
 
     cachedResponse = {

@@ -8,13 +8,13 @@ export const navItems = [
 ];
 
 export const socialLinks = [
-  { label: 'GitHub', href: 'https://github.com/gurugetnm', type: 'github' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/thevindu-guruge', type: 'linkedin' },
-  { label: 'TikTok', href: 'https://www.tiktok.com/@guruge_tnm', type: 'tiktok' },
-  { label: 'Instagram', href: 'https://www.instagram.com/thevindu_guruge', type: 'instagram' },
-  { label: 'Facebook', href: 'https://www.facebook.com/guruge.thevindu/', type: 'facebook' },
-  { label: 'WhatsApp', href: 'https://wa.me/94713019300', type: 'whatsapp' },
-  { label: 'Email', href: 'mailto:gurugetnm@gmail.com', type: 'email' },
+  { label: 'GitHub', href: 'https://github.com/NilupulNishan', type: 'github' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/nilupulnishan', type: 'linkedin' },
+  { label: 'TikTok', href: 'https://www.tiktok.com/@mrnilupul2k', type: 'tiktok' },
+  { label: 'Instagram', href: 'https://www.instagram.com/nilupul_nishan', type: 'instagram' },
+  { label: 'Facebook', href: 'https://www.facebook.com/mr.nilupul.2k', type: 'facebook' },
+  { label: 'WhatsApp', href: 'https://wa.me/94712702279', type: 'whatsapp' },
+  { label: 'Email', href: 'mailto:nilupulofficial2000@gmail.com', type: 'email' },
 ];
 
 export const techCategories = [
@@ -131,7 +131,7 @@ export const projects = [
     description: 'A personal portfolio website to showcase projects, skills, certifications, and creator collaboration paths.',
     tags: ['React', 'Vite', 'Tailwind CSS'],
     github: '',
-    live: 'https://www.thevinduguruge.site/',
+    live: 'https://www.nilupulnishan.me/',
     featured: false,
   },
   {

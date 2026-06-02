@@ -76,7 +76,7 @@ const creatorMenuItems = [
 ];
 
 const githubContributionSummary = {
-  username: 'gurugetnm',
+  username: 'NilupulNishan',
 };
 
 const projectDesktopPageSize = 3;
@@ -613,8 +613,8 @@ function Navbar() {
     <>
       <header className={`site-header ${scrolled ? 'site-header-scrolled' : ''}`}>
         <nav className="site-nav" aria-label="Main navigation">
-          <a className="brand-mark" href="#home" aria-label="Thevindu Guruge home" onClick={closeMobileMenu}>
-            <span>Thevindu Guruge</span>
+          <a className="brand-mark" href="#home" aria-label="Nilupul Nishan home" onClick={closeMobileMenu}>
+            <span>Nilupul Nishan</span>
           </a>
 
           <div className="nav-links">
@@ -822,12 +822,12 @@ function Hero() {
       <div className="page-shell hero-grid">
         <Motion.div className="hero-copy" variants={leanMotion ? mobileHeroStagger : heroStagger} initial={reduceMotion ? false : 'hidden'} animate="visible">
           <Motion.div className="hero-meta" variants={leanMotion ? mobileFadeUp : fadeUp}>
-            <span>AI Intern at Softvil Technologies</span>
+            <span>AI / ML Engineer &amp; Entrepreneur</span>
             <span>Sri Lanka</span>
-            <span>Software Engineering</span>
+            <span>Content Creator</span>
           </Motion.div>
-          <Motion.h1 variants={leanMotion ? mobileHeroStagger : heroStagger} aria-label="Thevindu Guruge">
-            {['Thevindu', 'Guruge'].map((word) => (
+          <Motion.h1 variants={leanMotion ? mobileHeroStagger : heroStagger} aria-label="Nilupul Nishan">
+            {['Nilupul', 'Nishan'].map((word) => (
               <Motion.span
                 key={word}
                 className="hero-name-word"
@@ -838,7 +838,7 @@ function Hero() {
               </Motion.span>
             ))}
           </Motion.h1>
-          <Motion.h2 variants={leanMotion ? mobileFadeUp : fadeUp}>Software Engineering Undergraduate & AI Intern at Softvil Technologies</Motion.h2>
+          <Motion.h2 variants={leanMotion ? mobileFadeUp : fadeUp}>AI / ML Engineer, Entrepreneur &amp; Content Creator</Motion.h2>
           <Motion.p className="hero-description" variants={leanMotion ? mobileFadeUp : fadeUp}>
             I build intelligent, user-focused software across AI, web, mobile, and full-stack development.
           </Motion.p>
@@ -850,7 +850,7 @@ function Hero() {
             <a className="button button-light" href="#contact">
               Contact Me
             </a>
-            <a className="button button-light" href="https://www.tiktok.com/@guruge_tnm" target="_blank" rel="noopener noreferrer">
+            <a className="button button-light" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
               <FaTiktok aria-hidden="true" /> TikTok
             </a>
           </Motion.div>
@@ -865,7 +865,7 @@ function Hero() {
           <div className="identity-portrait">
             <img
               src={profilePic}
-              alt="Thevindu Guruge, AI Intern at Softvil Technologies and Software Engineering undergraduate from Sri Lanka"
+              alt="Nilupul Nishan, AI/ML Engineer and entrepreneur from Sri Lanka"
               width="977"
               height="976"
               fetchPriority="high"
@@ -884,17 +884,17 @@ function Hero() {
 function About() {
   const highlights = [
     {
-      title: 'AI Intern',
-      meta: 'Current role',
-      description: 'Working on real AI-related product tasks at Softvil Technologies.',
+      title: 'AI / ML Engineer',
+      meta: 'Current focus',
+      description: 'Building intelligent software and AI-powered products.',
     },
     {
-      title: 'Software Engineering',
-      meta: 'Academic focus',
-      description: 'Studying and building across web, mobile, backend, and databases.',
+      title: 'Entrepreneur',
+      meta: 'Mindset',
+      description: 'Thinking beyond code — building things with real-world impact and business sense.',
     },
     {
-      title: 'Creator',
+      title: 'Content Creator',
       meta: 'Personal brand',
       description: 'Creating short-form content while keeping the brand clean and professional.',
     },
@@ -909,10 +909,10 @@ function About() {
     <section id="about" className="section">
       <div className="page-shell">
         <SectionHeader eyebrow="About" title="Calm, practical software thinking">
-          I&apos;m a Software Engineering undergraduate from Sri Lanka, currently working as an AI Intern at Softvil Technologies.
-          I&apos;m interested in AI, machine learning, mobile apps, web applications, and building real-world software solutions.
+          I&apos;m an AI/ML Engineer and entrepreneur from Sri Lanka, interested in building intelligent software,
+          web and mobile applications, and real-world AI solutions.
           <br />
-          Online, I also use the handles tnmguruge and gurugetnm across my creator and developer profiles.
+          Online, I also use the handles mrnilupul2k and NilupulNishan across my creator and developer profiles.
         </SectionHeader>
 
         <StaggerContainer className="about-card">
@@ -981,25 +981,20 @@ function Education() {
       affiliation: 'Affiliated with University of Westminster',
       degree: 'Bachelor of Engineering - BEng, Software Engineering',
       date: 'Sep 2023 - Present',
-      logo: '/education/iit-logo.png',
+      logo: '/education/usjp-logo.png',
       monogram: 'IIT',
     },
     {
-      institution: 'Dharmasoka College - Ambalangoda',
-      degree: 'Completed primary and secondary education with strong O/L results and followed the Physical Science stream for A/Ls, focusing on Combined Mathematics, Chemistry, and Physics.',
-      date: '2009 - 2022',
-      logo: '/education/dharmasoka-college-logo.png',
+      institution: 'Kuruwita Central College - Ambalangoda',
+      degree: 'Completed secondary education, then followed the Physical Science stream for A/Ls with ICT, Combined Mathematics, and Physics.',
+      date: '2015 - 2020',
+      logo: '/education/kcc-logo.png',
       monogram: 'DC',
       details: [
         {
-          title: 'G.C.E. Ordinary Level Examination',
-          meta: '2019',
-          description: 'Results: 8 A passes and 1 B pass',
-        },
-        {
           title: 'G.C.E. Advanced Level Examination',
-          meta: '2022',
-          description: 'Passed - Physical Science Stream: Combined Mathematics, Chemistry, Physics',
+          meta: '2020',
+          description: 'Physical Science Stream — ICT: A · Combined Mathematics: C · Physics: C',
         },
       ],
     },
@@ -1536,7 +1531,7 @@ function TikTokEmbed() {
     <div className="embed-card" ref={embedRef}>
       <div className="embed-card-header">
         <p className="embed-label">TikTok profile</p>
-        <a href="https://www.tiktok.com/@guruge_tnm" target="_blank" rel="noopener noreferrer">
+        <a href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
           Open profile <FaArrowRight aria-hidden="true" />
         </a>
       </div>
@@ -1544,24 +1539,24 @@ function TikTokEmbed() {
       <div className="tiktok-official-embed">
         <blockquote
           className="tiktok-embed"
-          cite="https://www.tiktok.com/@guruge_tnm"
-          data-unique-id="guruge_tnm"
+          cite="https://www.tiktok.com/@mrnilupul2k"
+          data-unique-id="mrnilupul2k"
           data-embed-type="creator"
           style={{ maxWidth: '100%', minWidth: 220 }}
         >
           <section>
-            <a href="https://www.tiktok.com/@guruge_tnm" target="_blank" rel="noopener noreferrer">
-              @guruge_tnm
+            <a href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
+              @mrnilupul2k
             </a>
           </section>
         </blockquote>
       </div>
 
       {!embedLoaded && embedChecked ? (
-        <a className="embed-profile-fallback" href="https://www.tiktok.com/@guruge_tnm" target="_blank" rel="noopener noreferrer">
+        <a className="embed-profile-fallback" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
           <FaTiktok aria-hidden="true" />
           <div>
-            <p>@guruge_tnm</p>
+            <p>@mrnilupul2k</p>
             <span>TikTok embed may be blocked here. Open the profile to view latest videos and stats.</span>
           </div>
           <FaArrowRight aria-hidden="true" />
@@ -1588,7 +1583,7 @@ function TikTokSection() {
               I create short-form content around music, captions, lifestyle moments, and relatable thoughts.
             </p>
             <span>Open for promotions, collaborations, and music-related content.</span>
-            <a className="button button-dark" href="https://www.tiktok.com/@guruge_tnm" target="_blank" rel="noopener noreferrer">
+            <a className="button button-dark" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
               Follow on TikTok <FaArrowRight aria-hidden="true" />
             </a>
           </div>
@@ -1700,7 +1695,7 @@ function SpotifyPlaylist() {
           </div>
           <iframe
             data-testid="embed-iframe"
-            title="Spotify playlist curated by Thevindu Guruge"
+            title="Spotify playlist curated by Nilupul Nishan"
             src="https://open.spotify.com/embed/playlist/7uDWHXuLF6Mi2UHoYhfA5l?utm_source=generator&theme=0"
             width="100%"
             height="352"
@@ -1754,7 +1749,7 @@ function Promotions() {
     }
 
     const message = [
-      'Hello Thevindu, I’m interested in a promotion/collaboration.',
+      "Hello Nilupul, I’m interested in a promotion/collaboration.",
       '',
       `Name: ${values.name}`,
       `Brand / Business: ${values.brand}`,
@@ -1762,7 +1757,7 @@ function Promotions() {
       `Message: ${values.message}`,
     ].join('\n');
 
-    window.open(`https://wa.me/94758096646?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    window.open(`https://wa.me/94712702279?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   }
 
   const hasError = (field) => Boolean(promotionErrors[field]);
@@ -1899,7 +1894,7 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="page-shell">
-        <p>&copy; 2026 Thevindu Guruge. All rights reserved.</p>
+        <p>&copy; 2026 Nilupul Nishan. All rights reserved.</p>
       </div>
     </footer>
   );

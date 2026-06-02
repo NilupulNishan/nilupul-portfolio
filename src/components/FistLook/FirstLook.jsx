@@ -6,10 +6,10 @@ import { FaFacebookSquare, FaGithub, FaInstagram, FaLinkedin } from "react-icons
 
 const FirstLook = () => {
   const [text] = useTypewriter({
-    words: ['Thevindu Guruge', 'a Software Engineering Undergraduate', 'a Full Stack Developer'],
+    words: ['Nilupul Nishan', 'an AI / ML Engineer', 'a Content Creator'],
     loop: {},
-    typeSpeed: 100,  
-    deleteSpeed: 50, 
+    typeSpeed: 100,
+    deleteSpeed: 50,
     delaySpeed: 1750,
   })
 
@@ -21,13 +21,13 @@ const FirstLook = () => {
               <span>{text}</span>
               <Cursor cursorColor="white" cursorStyle="|" />
             </h1>
-            <p className={styles.description}>I'm a Software Engineering undergraduate at Informatics Institute of Technology (IIT), passionate about Full Stack Development, scalable solutions, and continuous skill improvement.</p>
-            
+            <p className={styles.description}>I'm an AI/ML Engineer and entrepreneur from Sri Lanka, passionate about building intelligent software, web and mobile applications, and real-world AI solutions.</p>
+
             <div className={styles.btns}>
-              <a href="https://github.com/gurugetnm" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaGithub/></a>
-              <a href="https://www.linkedin.com/in/thevindu-guruge" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaLinkedin/></a>
-              <a href="https://www.facebook.com/thevindu.nimdiya" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaFacebookSquare/></a>
-              <a href="https://www.instagram.com/thevindu_guruge" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaInstagram/></a>
+              <a href="https://github.com/NilupulNishan" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaGithub/></a>
+              <a href="https://www.linkedin.com/in/nilupulnishan" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaLinkedin/></a>
+              <a href="https://www.facebook.com/mr.nilupul.2k" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaFacebookSquare/></a>
+              <a href="https://www.instagram.com/nilupul_nishan" className={styles.iconBtn} target="_blank" rel="noopener noreferrer"><FaInstagram/></a>
             </div>
             <div className={styles.btn2}>
                 <a href="#contact" className={styles.contactBtn}>Contact Me</a>
