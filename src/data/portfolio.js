@@ -82,6 +82,7 @@ export const techCategories = [
       'Postman',
       'VS Code',
       'Codex',
+      'Claude',
     ],
   },
 ];

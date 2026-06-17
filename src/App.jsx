@@ -23,6 +23,7 @@ import {
   FaWhatsapp,
 } from 'react-icons/fa';
 import {
+  SiClaude,
   SiCss3,
   SiDocker,
   SiExpress,
@@ -147,6 +148,7 @@ const techIconMap = {
   Postman: SiPostman,
   'VS Code': VscVscode,
   Codex: FaRobot,
+  Claude: SiClaude,
 };
 
 const fadeUp = {
@@ -977,12 +979,11 @@ function Experience() {
 function Education() {
   const educationItems = [
     {
-      institution: 'Informatics Institute of Technology (IIT)',
-      affiliation: 'Affiliated with University of Westminster',
-      degree: 'Bachelor of Engineering - BEng, Software Engineering',
-      date: 'Sep 2023 - Present',
+      institution: 'University of Sri Jayewardenepura, Sri Lanka',
+      degree: 'Bachelor of Science in Information and Communication Technology',
+      date: 'Jun 2022 - 2025',
       logo: '/education/usjp-logo.png',
-      monogram: 'IIT',
+      monogram: 'USJP',
     },
     {
       institution: 'Kuruwita Central College - Ambalangoda',
