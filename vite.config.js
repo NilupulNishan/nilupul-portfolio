@@ -7,7 +7,6 @@ import tailwindcss from '@tailwindcss/vite'
 function localApiRoutes() {
   const routes = {
     '/api/github-contributions': () => import('./api/github-contributions.js'),
-    '/api/spotify-playlist': () => import('./api/spotify-playlist.js'),
   }
 
   return {
