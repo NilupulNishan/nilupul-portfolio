@@ -14,7 +14,15 @@
       content="Nilupul Nishan, also known as mrnilupul2k and NilupulNishan, is an AI/ML Engineer and entrepreneur from Sri Lanka, focused on AI, web, mobile, and content creation."
     />
     <link rel="canonical" href="https://www.nilupulnishan.me/" />
-    <meta name="theme-color" content="#f7f5f0" />
+    <meta name="theme-color" content="#08090a" />
+    <script>
+      // Set theme before first paint to avoid a flash of the wrong theme.
+      (function () {
+        var t = 'dark';
+        try { t = localStorage.getItem('theme-v2') || 'dark'; } catch (e) { /* private mode */ }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.nilupulnishan.me/" />
     <meta property="og:title" content="Nilupul Nishan | AI / ML Engineer & Entrepreneur" />

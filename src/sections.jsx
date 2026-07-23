@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion as Motion, useReducedMotion, useScroll, useSpring } from 'framer-motion';
-import { Analytics } from '@vercel/analytics/react';
+import { AnimatePresence, motion as Motion, useReducedMotion } from 'framer-motion';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   FaArrowRight,
   FaArrowUp,
   FaBrain,
-  FaChevronDown,
+  FaCode,
+  FaCodeBranch,
   FaCubes,
+  FaDatabase,
   FaEnvelope,
   FaFacebookSquare,
   FaGithub,
@@ -18,6 +20,7 @@ import {
   FaMoon,
   FaPlug,
   FaRobot,
+  FaStar,
   FaSun,
   FaTiktok,
   FaWhatsapp,
@@ -50,10 +53,11 @@ import {
   SiVercel,
 } from 'react-icons/si';
 import { DiJava, DiPython } from 'react-icons/di';
-import { VscVscode } from 'react-icons/vsc';
+import { VscAzure, VscVscode } from 'react-icons/vsc';
 import profilePic from './assets/profile/profile_pic2.jpg';
 import certifications from './data/certifications.json';
 import {
+  heroStats,
   navItems,
   projects,
   socialLinks,
@@ -68,12 +72,6 @@ const promotionTypes = [
   'Shoutout',
   'Content Partnership',
   'Other',
-];
-
-const creatorMenuItems = [
-  { label: 'TikTok Creator', href: '#tiktok' },
-  { label: 'My Spotify Playlist', href: '#playlist' },
-  { label: 'Promotions', href: '#promotions' },
 ];
 
 const githubContributionSummary = {
@@ -94,11 +92,6 @@ const sectionToNavMap = {
   github: '#projects',
   certificates: '#projects',
   certifications: '#projects',
-  creator: '#playlist',
-  'creator-corner': '#playlist',
-  tiktok: '#playlist',
-  playlist: '#playlist',
-  promotions: '#playlist',
   contact: '#contact',
 };
 
@@ -139,6 +132,8 @@ const techIconMap = {
   MongoDB: SiMongodb,
   PostgreSQL: SiPostgresql,
   Firebase: SiFirebase,
+  'Cosmos DB': VscAzure,
+  ChromaDB: FaDatabase,
   Git: SiGit,
   GitHub: SiGithub,
   Docker: SiDocker,
@@ -427,52 +422,28 @@ function SectionPagination({
   );
 }
 
-function NavActivePill() {
-  const reduceMotion = useReducedMotion();
-
-  return reduceMotion ? <span className="nav-active-pill" aria-hidden="true" /> : (
-    <Motion.span
-      className="nav-active-pill"
-      layoutId="nav-active-pill"
-      transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-      aria-hidden="true"
-    />
-  );
-}
-
-function ScrollProgress() {
-  const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 28,
-    mass: 0.2,
-  });
-
-  return <Motion.div className="scroll-progress" style={{ scaleX: reduceMotion ? scrollYProgress : scaleX }} aria-hidden="true" />;
-}
-
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const [creatorOpen, setCreatorOpen] = useState(false);
-  const [mobileCreatorOpen, setMobileCreatorOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('#home');
   const [activeNav, setActiveNav] = useState('#home');
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-  const creatorRef = useRef(null);
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme-v2') || 'dark');
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
-  const isCreatorActive = activeNav === '#playlist';
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHome = location.pathname === '/';
 
   const closeMobileMenu = useCallback(() => {
     setOpen(false);
-    setMobileCreatorOpen(false);
   }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme', theme);
+    localStorage.setItem('theme-v2', theme);
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (themeColorMeta) {
+      themeColorMeta.setAttribute('content', theme === 'dark' ? '#08090a' : '#ffffff');
+    }
   }, [theme]);
 
   useEffect(() => {
@@ -494,7 +465,6 @@ function Navbar() {
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setCreatorOpen(false);
         closeMobileMenu();
       }
     };
@@ -506,14 +476,8 @@ function Navbar() {
   }, [closeMobileMenu]);
 
   useEffect(() => {
-    const handleHashChange = () => {
-      setCreatorOpen(false);
-      closeMobileMenu();
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [closeMobileMenu]);
+    closeMobileMenu();
+  }, [location.pathname, closeMobileMenu]);
 
   useEffect(() => {
     if (!open) {
@@ -534,26 +498,9 @@ function Navbar() {
   }, [closeMobileMenu, open]);
 
   useEffect(() => {
-    if (!creatorOpen) {
-      return undefined;
-    }
-
-    const handlePointerDown = (event) => {
-      if (!creatorRef.current?.contains(event.target)) {
-        setCreatorOpen(false);
-      }
-    };
-
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, [creatorOpen]);
-
-  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1100) {
         closeMobileMenu();
-      } else {
-        setCreatorOpen(false);
       }
     };
 
@@ -564,6 +511,11 @@ function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 18);
+
+      if (!isHome) {
+        return;
+      }
+
       const sectionTargets = Array.from(document.querySelectorAll('section[id]'))
         .filter((section) => sectionToNavMap[section.id]);
 
@@ -571,14 +523,12 @@ function Navbar() {
       const bottomDistance = documentHeight - (window.scrollY + window.innerHeight);
 
       if (bottomDistance < 24) {
-        setActiveSection('#contact');
         setActiveNav('#contact');
         return;
       }
 
       const contactSection = document.querySelector('#contact');
       if (contactSection?.getBoundingClientRect().top <= window.innerHeight * 0.72) {
-        setActiveSection('#contact');
         setActiveNav('#contact');
         return;
       }
@@ -586,11 +536,9 @@ function Navbar() {
       const marker = window.innerHeight * 0.45;
       const currentSectionId = sectionTargets.reduce((current, section) => {
         const rect = section.getBoundingClientRect();
-
         if (rect.top <= marker) {
           return section.id;
         }
-
         return current;
       }, '');
 
@@ -599,8 +547,6 @@ function Navbar() {
       }
 
       const mappedNav = sectionToNavMap[currentSectionId];
-      setActiveSection(`#${currentSectionId}`);
-
       if (mappedNav) {
         setActiveNav(mappedNav);
       }
@@ -609,76 +555,77 @@ function Navbar() {
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isHome]);
+
+  const goToSection = useCallback((section) => {
+    closeMobileMenu();
+    if (location.pathname === '/') {
+      const el = document.getElementById(section);
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      navigate(section === 'home' ? '/' : `/#${section}`, { replace: true });
+    } else {
+      navigate('/', { state: { scrollTo: section } });
+    }
+  }, [closeMobileMenu, location.pathname, navigate]);
+
+  const renderNavItem = (item, isMobile) => {
+    if (item.type === 'route') {
+      return (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end
+          className={({ isActive }) => (isActive ? 'active-nav' : '')}
+          onClick={isMobile ? closeMobileMenu : undefined}
+        >
+          <span className="nav-link-label">{item.label}</span>
+        </NavLink>
+      );
+    }
+
+    const isActive = isHome && activeNav === `#${item.section}`;
+    return (
+      <a
+        key={item.to}
+        href={item.to}
+        className={isActive ? 'active-nav' : ''}
+        onClick={(event) => {
+          event.preventDefault();
+          goToSection(item.section);
+        }}
+      >
+        <span className="nav-link-label">{item.label}</span>
+      </a>
+    );
+  };
 
   return (
     <>
       <header className={`site-header ${scrolled ? 'site-header-scrolled' : ''}`}>
         <nav className="site-nav" aria-label="Main navigation">
-          <a className="brand-mark" href="#home" aria-label="Nilupul Nishan home" onClick={closeMobileMenu}>
+          <NavLink className="brand-mark" to="/" aria-label="Nilupul Nishan home" onClick={closeMobileMenu}>
             <span>Nilupul Nishan</span>
-          </a>
+          </NavLink>
 
           <div className="nav-links">
-            {navItems.map((item) => {
-              if (item.label === 'Creator') {
-                return (
-                  <div
-                    key={item.href}
-                    className={`nav-dropdown ${creatorOpen ? 'is-open' : ''} ${isCreatorActive ? 'active-dropdown' : ''}`}
-                    ref={creatorRef}
-                    onMouseEnter={() => setCreatorOpen(true)}
-                    onMouseLeave={() => setCreatorOpen(false)}
-                  >
-                    <button
-                      className="nav-dropdown-trigger"
-                      type="button"
-                      aria-expanded={creatorOpen}
-                      aria-controls="creator-dropdown"
-                      onClick={() => setCreatorOpen((value) => !value)}
-                    >
-                      {isCreatorActive ? <NavActivePill /> : null}
-                      <span className="nav-link-label">Creator</span>
-                      <FaChevronDown aria-hidden="true" />
-                    </button>
-
-                    <AnimatePresence>
-                      {creatorOpen ? (
-                        <Motion.div
-                          id="creator-dropdown"
-                          className="creator-dropdown"
-                          initial={reduceMotion ? false : leanMotion ? { opacity: 0, y: 6 } : { opacity: 0, y: 8, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={reduceMotion ? { opacity: 0 } : leanMotion ? { opacity: 0, y: 6 } : { opacity: 0, y: 8, scale: 0.98 }}
-                          transition={{ duration: reduceMotion ? 0 : leanMotion ? 0.16 : 0.18, ease: 'easeOut' }}
-                        >
-                          {creatorMenuItems.map((child) => (
-                            <a
-                              key={child.href}
-                              href={child.href}
-                              className={activeSection === child.href ? 'active-nav' : ''}
-                              onClick={() => setCreatorOpen(false)}
-                            >
-                              {child.label}
-                            </a>
-                          ))}
-                        </Motion.div>
-                      ) : null}
-                    </AnimatePresence>
-                  </div>
-                );
-              }
-
-              return (
-                <a key={item.href} href={item.href} className={activeNav === item.href ? 'active-nav' : ''}>
-                  {activeNav === item.href ? <NavActivePill /> : null}
-                  <span className="nav-link-label">{item.label}</span>
-                </a>
-              );
-            })}
+            {navItems.map((item) => renderNavItem(item, false))}
           </div>
 
           <div className="nav-actions">
+            <a
+              className="button button-secondary nav-cta"
+              href="/#contact"
+              onClick={(event) => {
+                event.preventDefault();
+                goToSection('contact');
+              }}
+            >
+              Get in touch
+            </a>
             <button
               className="theme-toggle"
               type="button"
@@ -691,12 +638,7 @@ function Navbar() {
             <button
               className={`menu-button ${open ? 'is-open' : ''}`}
               type="button"
-              onClick={() => setOpen((value) => {
-                if (value) {
-                  setMobileCreatorOpen(false);
-                }
-                return !value;
-              })}
+              onClick={() => setOpen((value) => !value)}
               aria-expanded={open}
               aria-controls="mobile-navigation"
               aria-label={open ? 'Close navigation' : 'Open navigation'}
@@ -732,58 +674,7 @@ function Navbar() {
               onPointerDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}
             >
-              {navItems.map((item) => {
-                if (item.label === 'Creator') {
-                  return (
-                    <div key={item.href} className="mobile-creator-group">
-                      <button
-                        className={`mobile-creator-trigger ${isCreatorActive ? 'active-nav' : ''} ${mobileCreatorOpen ? 'is-open' : ''}`}
-                        type="button"
-                        aria-expanded={mobileCreatorOpen}
-                        aria-controls="mobile-creator-links"
-                        onClick={() => setMobileCreatorOpen((value) => !value)}
-                      >
-                        Creator <FaChevronDown aria-hidden="true" />
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {mobileCreatorOpen ? (
-                          <Motion.div
-                            id="mobile-creator-links"
-                            className="mobile-creator-links"
-                            initial={reduceMotion ? false : { opacity: 0, y: leanMotion ? -6 : -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -4 }}
-                            transition={{ duration: reduceMotion ? 0 : leanMotion ? 0.16 : 0.16, ease: 'easeOut' }}
-                          >
-                            {creatorMenuItems.map((child) => (
-                              <a
-                                key={child.href}
-                                href={child.href}
-                                className={activeSection === child.href ? 'active-nav' : ''}
-                                onClick={closeMobileMenu}
-                              >
-                                {child.label}
-                              </a>
-                            ))}
-                          </Motion.div>
-                        ) : null}
-                      </AnimatePresence>
-                    </div>
-                  );
-                }
-
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className={activeNav === item.href ? 'active-nav' : ''}
-                    onClick={closeMobileMenu}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
+              {navItems.map((item) => renderNavItem(item, true))}
             </Motion.div>
           </Motion.div>
         ) : null}
@@ -818,53 +709,44 @@ function Hero() {
 
   return (
     <section id="home" className="hero-section">
-      <div className="soft-blur soft-blur-one" />
-      <div className="soft-blur soft-blur-two" />
+      <div className="page-shell">
+        <div className="hero-layout">
+          <Motion.div className="hero-copy" variants={leanMotion ? mobileHeroStagger : heroStagger} initial={reduceMotion ? false : 'hidden'} animate="visible">
+            <Motion.p className="eyebrow" variants={leanMotion ? mobileFadeUp : fadeUp}>
+              AI / ML Engineer &middot; Entrepreneur &middot; Content Creator
+            </Motion.p>
+            <Motion.h1 variants={leanMotion ? mobileHeroStagger : heroStagger} aria-label="Nilupul Nishan">
+              {['Nilupul', 'Nishan'].map((word) => (
+                <Motion.span
+                  key={word}
+                  className="hero-name-word"
+                  variants={leanMotion ? mobileHeroWordReveal : heroWordReveal}
+                  aria-hidden="true"
+                >
+                  {word}
+                </Motion.span>
+              ))}
+            </Motion.h1>
+            <Motion.p className="hero-description" variants={leanMotion ? mobileFadeUp : fadeUp}>
+              I build intelligent, user-focused software across AI, web, mobile, and full-stack development — from Sri Lanka to wherever the work matters.
+            </Motion.p>
 
-      <div className="page-shell hero-grid">
-        <Motion.div className="hero-copy" variants={leanMotion ? mobileHeroStagger : heroStagger} initial={reduceMotion ? false : 'hidden'} animate="visible">
-          <Motion.div className="hero-meta" variants={leanMotion ? mobileFadeUp : fadeUp}>
-            <span>AI / ML Engineer &amp; Entrepreneur</span>
-            <span>Sri Lanka</span>
-            <span>Content Creator</span>
+            <Motion.div className="hero-actions" variants={leanMotion ? mobileFadeUp : fadeUp}>
+              <a className="button button-primary" href="#projects">
+                View Projects <FaArrowRight aria-hidden="true" />
+              </a>
+              <a className="button button-secondary" href="#contact">
+                Contact Me
+              </a>
+            </Motion.div>
           </Motion.div>
-          <Motion.h1 variants={leanMotion ? mobileHeroStagger : heroStagger} aria-label="Nilupul Nishan">
-            {['Nilupul', 'Nishan'].map((word) => (
-              <Motion.span
-                key={word}
-                className="hero-name-word"
-                variants={leanMotion ? mobileHeroWordReveal : heroWordReveal}
-                aria-hidden="true"
-              >
-                {word}
-              </Motion.span>
-            ))}
-          </Motion.h1>
-          <Motion.h2 variants={leanMotion ? mobileFadeUp : fadeUp}>AI / ML Engineer, Entrepreneur &amp; Content Creator</Motion.h2>
-          <Motion.p className="hero-description" variants={leanMotion ? mobileFadeUp : fadeUp}>
-            I build intelligent, user-focused software across AI, web, mobile, and full-stack development.
-          </Motion.p>
 
-          <Motion.div className="hero-actions" variants={leanMotion ? mobileFadeUp : fadeUp}>
-            <a className="button button-dark" href="#projects">
-              View Projects <FaArrowRight aria-hidden="true" />
-            </a>
-            <a className="button button-light" href="#contact">
-              Contact Me
-            </a>
-            <a className="button button-light" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
-              <FaTiktok aria-hidden="true" /> TikTok
-            </a>
-          </Motion.div>
-        </Motion.div>
-
-        <Motion.div
-          className="identity-card floating-card"
-          initial={heroImageMotion}
-          animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-          transition={heroImageTransition}
-        >
-          <div className="identity-portrait">
+          <Motion.div
+            className="hero-portrait"
+            initial={heroImageMotion}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            transition={heroImageTransition}
+          >
             <img
               src={profilePic}
               alt="Nilupul Nishan, AI/ML Engineer and entrepreneur from Sri Lanka"
@@ -873,10 +755,21 @@ function Hero() {
               fetchPriority="high"
               decoding="async"
             />
-          </div>
-          <div className="identity-details">
-            <h3>AI, software engineering, and creator work with a practical product mindset.</h3>
-          </div>
+          </Motion.div>
+        </div>
+
+        <Motion.div
+          className="hero-stats"
+          variants={leanMotion ? mobileFadeUp : fadeUp}
+          initial={reduceMotion ? false : 'hidden'}
+          animate="visible"
+        >
+          {heroStats.map((stat) => (
+            <div className="hero-stat" key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </div>
+          ))}
         </Motion.div>
       </div>
     </section>
@@ -932,45 +825,76 @@ function About() {
 }
 
 function Experience() {
-  const experience = {
-    date: 'Aug 2025 - Present',
-    company: 'Softvil Technologies',
-    role: 'AI Intern',
-    logo: '/softvil-logo.png',
-    description: 'Working on AI-related solutions, software features, debugging, development tasks, and real-world product improvements.',
-  };
+  // One entry per company. Consecutive roles at the same company are grouped
+  // under `positions`; a different company is a separate entry/box.
+  const experienceItems = [
+    {
+      company: 'Softvil Technologies',
+      location: 'Sri Lanka · On-site',
+      logo: '/softvil-logo.png',
+      duration: '11 mos',
+      positions: [
+        {
+          role: 'Associate AI/ML Engineer',
+          meta: 'Full-time · Feb 2026 - Present · 5 mos',
+          description: 'Building and shipping production AI/ML solutions — extending Retrieval-Augmented Generation (RAG) pipelines into real-time, context-aware enterprise features.',
+          tags: ['Large Language Models (LLM)', 'RAG', 'PostgreSQL'],
+        },
+        {
+          role: 'AI Engineer',
+          meta: 'Internship · Aug 2025 - Jan 2026 · 6 mos',
+          description: 'Architected and deployed Retrieval-Augmented Generation (RAG) pipelines, integrating structured and unstructured data to provide real-time, context-aware enterprise solutions.',
+          tags: ['Large Language Models (LLM)', 'RAG', 'PostgreSQL'],
+        },
+      ],
+    },
+  ];
 
   return (
     <section id="experience" className="section">
       <div className="page-shell">
-        <div className="experience-heading">
-          <p>Current professional work</p>
-          <h2>Experience</h2>
-        </div>
+        <SectionHeader eyebrow="Experience" title="Current professional work" />
 
-        <Reveal className="experience-card">
-          <div className="experience-card-main">
-            <div className="experience-brand">
-              <div className="experience-logo">
-                <img src={experience.logo} alt={`${experience.company} logo`} width="389" height="258" loading="lazy" decoding="async" />
+        <StaggerContainer className="card-grid">
+          {experienceItems.map((company) => (
+            <MotionCard key={company.company} className="experience-card">
+              <div className="experience-card-main">
+                <div className="experience-brand">
+                  <div className="experience-logo">
+                    <img src={company.logo} alt={`${company.company} logo`} width="389" height="258" loading="lazy" decoding="async" />
+                  </div>
+                  <div>
+                    {company.location ? <span>{company.location}</span> : null}
+                    <h3>{company.company}</h3>
+                  </div>
+                </div>
+
+                {company.positions.length > 1 && company.duration ? (
+                  <span className="experience-date">{company.duration}</span>
+                ) : null}
               </div>
-              <div>
-                <span>{experience.company}</span>
-                <h3>{experience.role}</h3>
+
+              <div className="experience-roles">
+                {company.positions.map((position) => (
+                  <div className="experience-role" key={position.role}>
+                    <h4>{position.role}</h4>
+                    <p className="experience-role-meta">{position.meta}</p>
+                    {position.description ? (
+                      <p className="experience-description">{position.description}</p>
+                    ) : null}
+                    {position.tags?.length ? (
+                      <div className="experience-tags" aria-label={`${position.role} focus areas`}>
+                        {position.tags.map((tag) => (
+                          <span key={tag}>{tag}</span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
               </div>
-            </div>
-
-            <span className="experience-date">{experience.date}</span>
-          </div>
-
-          <p className="experience-description">{experience.description}</p>
-
-          <div className="experience-tags" aria-label="Experience focus areas">
-            <span>AI Solutions</span>
-            <span>Debugging</span>
-            <span>Product Improvements</span>
-          </div>
-        </Reveal>
+            </MotionCard>
+          ))}
+        </StaggerContainer>
       </div>
     </section>
   );
@@ -1101,7 +1025,7 @@ function Projects() {
   return (
     <section id="projects" className="section">
       <div className="page-shell">
-        <SectionHeader eyebrow="Projects" title="Projects and coursework">
+        <SectionHeader eyebrow="Projects" title="Projects">
           A broader look at apps, coursework, and software systems I have built while learning and shipping.
         </SectionHeader>
 
@@ -1337,6 +1261,8 @@ function GitHubActivity() {
     totalContributions: null,
     lastYearContributions: null,
     contributionCalendar: null,
+    totals: null,
+    repositories: [],
     lastUpdated: null,
     error: null,
   });
@@ -1359,6 +1285,8 @@ function GitHubActivity() {
             totalContributions: data.totalContributions,
             lastYearContributions: typeof data.lastYearContributions === 'number' ? data.lastYearContributions : null,
             contributionCalendar: data.contributionCalendar || null,
+            totals: data.totals || null,
+            repositories: Array.isArray(data.repositories) ? data.repositories : [],
             lastUpdated: data.lastUpdated || null,
             error: null,
           });
@@ -1370,6 +1298,8 @@ function GitHubActivity() {
             totalContributions: null,
             lastYearContributions: null,
             contributionCalendar: null,
+            totals: null,
+            repositories: [],
             lastUpdated: null,
             error: error.message || 'Contribution data unavailable.',
           });
@@ -1384,19 +1314,34 @@ function GitHubActivity() {
     };
   }, []);
 
+  const formatCount = (value) => (typeof value === 'number' ? new Intl.NumberFormat('en-US').format(value) : '—');
+
+  const githubStatTiles = [
+    { icon: FaCode, value: githubData.totals?.commits, label: 'Commits' },
+    { icon: FaCodeBranch, value: githubData.totals?.pullRequests, label: 'Pull requests' },
+    { icon: FaGithub, value: githubData.lastYearContributions ?? githubData.totalContributions, label: 'GitHub contributions' },
+  ];
+
   const contributionCount =
-    githubData.status === 'success'
-      ? new Intl.NumberFormat('en-US').format(githubData.lastYearContributions ?? githubData.totalContributions)
-      : githubData.status === 'loading'
-        ? 'Loading'
-        : 'Unavailable';
+    githubData.status === 'loading' ? 'Loading' : 'Unavailable';
 
   const contributionLabel =
-    githubData.status === 'success'
-      ? 'contributions in the last 52 weeks'
-      : githubData.status === 'loading'
-        ? 'GitHub contributions'
-        : 'Contribution data unavailable';
+    githubData.status === 'loading' ? 'GitHub contributions' : 'Contribution data unavailable';
+
+  const activeToday = (() => {
+    const weeks = githubData.contributionCalendar?.weeks;
+    if (!weeks?.length) {
+      return false;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    for (let weekIndex = weeks.length - 1; weekIndex >= Math.max(0, weeks.length - 2); weekIndex -= 1) {
+      const day = (weeks[weekIndex].contributionDays || []).find((item) => item.date === today);
+      if (day) {
+        return (day.contributionCount || 0) > 0;
+      }
+    }
+    return false;
+  })();
 
   const lastUpdatedLabel = githubData.lastUpdated
     ? `Last updated ${new Intl.DateTimeFormat('en-US', {
@@ -1426,25 +1371,80 @@ function GitHubActivity() {
             </a>
           </div>
 
-          <div className="github-count-row">
-            <strong className={githubData.status !== 'success' ? 'github-status-text' : undefined}>{contributionCount}</strong>
-            <span>{contributionLabel}</span>
-            {githubData.status === 'success' ? <small className="github-source-label">Fetched from GitHub GraphQL</small> : null}
-          </div>
-
-          {lastUpdatedLabel ? <p className="github-updated">{lastUpdatedLabel}</p> : null}
+          {githubData.status === 'success' ? (
+            <div className="github-stat-row">
+              {githubStatTiles.map((tile) => {
+                const TileIcon = tile.icon;
+                return (
+                  <div className="github-stat-card" key={tile.label}>
+                    <span className="github-stat-icon" aria-hidden="true"><TileIcon /></span>
+                    <div className="github-stat-copy">
+                      <strong>{formatCount(tile.value)}</strong>
+                      <span>{tile.label}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="github-count-row">
+              <strong className="github-status-text">{contributionCount}</strong>
+              <span>{contributionLabel}</span>
+            </div>
+          )}
 
           <div className="github-chart-wrap">
-            <GitHubContributionCalendar calendar={githubData.contributionCalendar} />
-            <div className="github-legend" aria-label="Contribution intensity legend">
-              <span>Less</span>
-              <i className="level-0" />
-              <i className="level-1" />
-              <i className="level-2" />
-              <i className="level-3" />
-              <i className="level-4" />
-              <span>More</span>
+            <div className="github-chart-head">
+              <div>
+                <h4>Contribution graph</h4>
+                <p>Daily activity intensity across the last 52 weeks.</p>
+              </div>
+              <div className="github-legend" aria-label="Contribution intensity legend">
+                <span>Less</span>
+                <i className="level-0" />
+                <i className="level-1" />
+                <i className="level-2" />
+                <i className="level-3" />
+                <i className="level-4" />
+                <span>More</span>
+              </div>
             </div>
+            <GitHubContributionCalendar calendar={githubData.contributionCalendar} />
+          </div>
+
+          {githubData.repositories.length > 0 ? (
+            <div className="github-repos">
+              <div className="github-repos-head">
+                <strong>Recently updated repositories</strong>
+                <span>Selected public work straight from the GitHub profile.</span>
+              </div>
+              <div className="github-repo-grid">
+                {githubData.repositories.map((repo) => (
+                  <a className="github-repo-card" key={repo.nameWithOwner} href={repo.url} target="_blank" rel="noopener noreferrer">
+                    <span className="github-repo-name"><FaGithub aria-hidden="true" /> {repo.name}</span>
+                    <p>{repo.description || 'Public repository on GitHub.'}</p>
+                    <span className="github-repo-meta">
+                      {repo.language ? (
+                        <span className="github-repo-lang">
+                          <i style={repo.languageColor ? { background: repo.languageColor } : undefined} aria-hidden="true" />
+                          {repo.language}
+                        </span>
+                      ) : null}
+                      <span><FaStar aria-hidden="true" /> {formatCount(repo.stars)}</span>
+                      <span><FaCodeBranch aria-hidden="true" /> {formatCount(repo.forks)}</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="github-badge-row">
+            {githubData.status === 'success' ? <small className="github-source-label">Fetched from GitHub GraphQL</small> : null}
+            {githubData.status === 'success' && activeToday ? (
+              <small className="github-active-label"><i aria-hidden="true" /> Active today</small>
+            ) : null}
+            {lastUpdatedLabel ? <small className="github-updated-label">{lastUpdatedLabel}</small> : null}
           </div>
 
           <p className="github-note">
@@ -1584,126 +1584,11 @@ function TikTokSection() {
               I create short-form content around music, captions, lifestyle moments, and relatable thoughts.
             </p>
             <span>Open for promotions, collaborations, and music-related content.</span>
-            <a className="button button-dark" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
+            <a className="button button-primary" href="https://www.tiktok.com/@mrnilupul2k" target="_blank" rel="noopener noreferrer">
               Follow on TikTok <FaArrowRight aria-hidden="true" />
             </a>
           </div>
           <TikTokEmbed />
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function SpotifyPlaylist() {
-  const [playlistData, setPlaylistData] = useState({
-    status: 'loading',
-    followers: null,
-    totalTracks: null,
-    lastUpdated: null,
-    error: null,
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadPlaylistData() {
-      try {
-        const response = await fetch('/api/spotify-playlist');
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Spotify playlist data unavailable.');
-        }
-
-        if (!cancelled) {
-          setPlaylistData({
-            status: 'success',
-            followers: typeof data.followers === 'number' ? data.followers : null,
-            totalTracks: typeof data.totalTracks === 'number' ? data.totalTracks : null,
-            lastUpdated: data.lastUpdated || null,
-            error: null,
-          });
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setPlaylistData({
-            status: 'error',
-            followers: null,
-            totalTracks: null,
-            lastUpdated: null,
-            error: error.message || 'Spotify playlist data unavailable.',
-          });
-        }
-      }
-    }
-
-    loadPlaylistData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const playlistFollowerLabel =
-    playlistData.status === 'loading'
-      ? 'Loading'
-      : playlistData.followers === null
-        ? 'Unavailable'
-        : new Intl.NumberFormat('en-US').format(playlistData.followers);
-  const showPlaylistFollowerStat = playlistData.status === 'loading' || playlistData.followers !== null;
-
-  const playlistTrackLabel =
-    playlistData.status === 'loading'
-      ? 'Loading'
-      : playlistData.totalTracks === null
-        ? 'Unavailable'
-        : new Intl.NumberFormat('en-US').format(playlistData.totalTracks);
-  const showPlaylistTrackStat = playlistData.status === 'loading' || playlistData.totalTracks !== null;
-  const showPlaylistStats = showPlaylistFollowerStat || showPlaylistTrackStat;
-
-  return (
-    <section id="playlist" className="section">
-      <div className="page-shell">
-        <SectionHeader eyebrow="Playlist" title="My Spotify Playlist">
-          A playlist curated by me — built around sounds, moods, and lyrics that inspire my content and creative side.
-        </SectionHeader>
-
-        <Reveal className="spotify-feature-card">
-          <div className="spotify-card-copy">
-            <p className="eyebrow">Curated by me</p>
-            <h3>Sounds, moods, and lyrics behind my creative side.</h3>
-            <p>A playlist curated by me — built around the sounds, moods, and lyrics that inspire my content and creative side.</p>
-            {showPlaylistStats && (
-              <div className="spotify-stat-row" aria-label="Spotify playlist stats">
-                {showPlaylistFollowerStat && (
-                  <span>
-                    <strong>{playlistFollowerLabel}</strong>
-                    Playlist saves
-                  </span>
-                )}
-                {showPlaylistTrackStat && (
-                  <span>
-                    <strong>{playlistTrackLabel}</strong>
-                    Tracks
-                  </span>
-                )}
-              </div>
-            )}
-            <small className="spotify-live-note">
-              {playlistData.status === 'success' ? 'Updated from Spotify.' : 'Save count unavailable when Spotify API credentials are not configured.'}
-            </small>
-          </div>
-          <iframe
-            data-testid="embed-iframe"
-            title="Spotify playlist curated by Nilupul Nishan"
-            src="https://open.spotify.com/embed/playlist/7uDWHXuLF6Mi2UHoYhfA5l?utm_source=generator&theme=0"
-            width="100%"
-            height="352"
-            frameBorder="0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-          />
         </Reveal>
       </div>
     </section>
@@ -1832,7 +1717,7 @@ function Promotions() {
                 {hasError('message') ? <FormError id="promotion-message-error">{promotionErrors.message}</FormError> : null}
               </label>
               <p>Submitting opens WhatsApp with your inquiry details ready to send.</p>
-              <button className="button button-dark full" type="submit">
+              <button className="button button-primary full" type="submit">
                 Send Promotion Inquiry
               </button>
             </form>
@@ -1863,12 +1748,12 @@ function Contact() {
             <p>Open to AI opportunities, software projects, collaborations, and promotions.</p>
             <div className="contact-ctas">
               {whatsAppLink ? (
-                <a className="button button-dark" href={whatsAppLink.href} target="_blank" rel="noopener noreferrer">
+                <a className="button button-primary" href={whatsAppLink.href} target="_blank" rel="noopener noreferrer">
                   <FaWhatsapp aria-hidden="true" /> Message on WhatsApp
                 </a>
               ) : null}
               {emailLink ? (
-                <a className="button button-light" href={emailLink.href}>
+                <a className="button button-secondary" href={emailLink.href}>
                   <FaEnvelope aria-hidden="true" /> Send Email
                 </a>
               ) : null}
@@ -1895,7 +1780,31 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="page-shell">
-        <p>&copy; 2026 Nilupul Nishan. All rights reserved.</p>
+        <div className="footer-grid">
+          <div className="footer-cell footer-brand">
+            <strong>Nilupul Nishan</strong>
+            <p>AI/ML Engineer, entrepreneur, and content creator from Sri Lanka — building intelligent, user-focused software.</p>
+          </div>
+          <nav className="footer-cell footer-nav" aria-label="Footer navigation">
+            <p className="footer-heading">Explore</p>
+            {navItems.map((item) => (
+              <a key={item.to} href={item.to}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <div className="footer-cell footer-social">
+            <p className="footer-heading">Connect</p>
+            {socialLinks.map((social) => (
+              <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer">
+                {social.label}
+              </a>
+            ))}
+          </div>
+          <div className="footer-cell footer-meta">
+            <p>&copy; 2026 Nilupul Nishan. All rights reserved.</p>
+          </div>
+        </div>
       </div>
     </footer>
   );
@@ -1920,7 +1829,7 @@ function BackToTop() {
           className="back-to-top"
           type="button"
           aria-label="Back to top"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'auto' })}
           initial={reduceMotion ? false : leanMotion ? { opacity: 0, y: 8 } : { opacity: 0, y: 14, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={reduceMotion ? { opacity: 0 } : leanMotion ? { opacity: 0, y: 8 } : { opacity: 0, y: 14, scale: 0.92 }}
@@ -1935,31 +1844,24 @@ function BackToTop() {
   );
 }
 
-function App() {
-  return (
-    <div className="app">
-      <ScrollProgress />
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Education />
-        <TechStack />
-        <Experience />
-        <Projects />
-        <GitHubActivity />
-        <Certifications />
-        <TikTokSection />
-        <SpotifyPlaylist />
-        <Promotions />
-        <Contact />
-      </main>
-      <Footer />
-      <BackToTop />
-      <Analytics />
-    </div>
-  );
-}
-
-export default App;
+export {
+  Navbar,
+  Footer,
+  BackToTop,
+  Reveal,
+  StaggerContainer,
+  MotionCard,
+  SectionHeader,
+  Hero,
+  About,
+  Education,
+  TechStack,
+  Experience,
+  Projects,
+  GitHubActivity,
+  Certifications,
+  TikTokSection,
+  Promotions,
+  Contact,
+};
 

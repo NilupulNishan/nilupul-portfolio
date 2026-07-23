@@ -1,10 +1,12 @@
 export const navItems = [
-  { label: 'Home', href: '#home' },
-  { label: 'About', href: '#about' },
-  { label: 'Experience', href: '#experience' },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Creator', href: '#playlist' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', to: '/', type: 'anchor', section: 'home' },
+  { label: 'About', to: '/#about', type: 'anchor', section: 'about' },
+  { label: 'Experience', to: '/#experience', type: 'anchor', section: 'experience' },
+  { label: 'Projects', to: '/#projects', type: 'anchor', section: 'projects' },
+  { label: 'Channels', to: '/channels', type: 'route' },
+  { label: 'Afterlife', to: '/afterlife', type: 'route' },
+  { label: 'Lab', to: '/lab', type: 'route' },
+  { label: 'Contact', to: '/#contact', type: 'anchor', section: 'contact' },
 ];
 
 export const socialLinks = [
@@ -67,7 +69,8 @@ export const techCategories = [
       'MySQL',
       'PostgreSQL',
       'Firebase',
-      'MongoDB',
+      'Cosmos DB',
+      'ChromaDB',
     ],
   },
   {
@@ -81,7 +84,6 @@ export const techCategories = [
       'Figma',
       'Postman',
       'VS Code',
-      'Codex',
       'Claude',
     ],
   },
@@ -100,6 +102,83 @@ export const logoLoopItems = [
   'Figma',
   'GitHub',
   'Postman',
+];
+
+// Brands / content series shown on the /channels page. Each brand carries its own
+// platform links. Leave a link `href` empty ('') and it renders as "coming soon".
+export const brands = [
+  {
+    name: 'Nilupul Nishan — AI & Tech',
+    category: 'English · Tech',
+    description: 'AI/ML, tech, and creator insights in English across professional and social platforms.',
+    links: [
+      { type: 'instagram', href: 'https://www.instagram.com/nilupul_nishan' },
+      { type: 'x', href: '' },
+      { type: 'linkedin', href: 'https://www.linkedin.com/in/nilupulnishan/' },
+    ],
+  },
+  {
+    name: 'Nilupul Nishan — Real Talk',
+    category: 'Sinhala · Motivation',
+    description: 'Candid, relatable motivation in Sinhala — real-life moments turned into practical tips for Sri Lankan youth.',
+    links: [
+      { type: 'facebook', href: 'https://www.facebook.com/mr.nilupul.2k' },
+      { type: 'tiktok', href: 'https://www.tiktok.com/@mrnilupul2k' },
+    ],
+  },
+  {
+    name: 'Magha Fitness',
+    category: 'Fitness',
+    description: 'Fitness brand — workouts, routines, and healthy-lifestyle content.',
+    links: [
+      { type: 'facebook', href: 'https://www.facebook.com/magha.fitzone' },
+      { type: 'instagram', href: '' },
+      { type: 'tiktok', href: '' },
+    ],
+  },
+  {
+    name: 'Emography',
+    category: 'Photography',
+    logo: '/brands/emography-black.jpg',
+    description: 'Photography brand — capturing moments, emotion, and story through the lens.',
+    links: [
+      { type: 'facebook', href: 'https://www.facebook.com/emography25' },
+      { type: 'portfolio', href: 'https://emography.pixieset.com/' },
+    ],
+  },
+];
+
+// Philanthropy / legacy work shown on the /afterlife page. Placeholder copy — edit freely.
+export const afterlifeItems = [
+  {
+    title: 'Tech Education Outreach',
+    description: 'Free coding and AI-literacy sessions for students and young creators in Sri Lanka.',
+    tags: ['Education', 'Mentoring'],
+  },
+  {
+    title: 'Community Giving',
+    description: 'Supporting local causes and charitable initiatives that are close to my heart.',
+    tags: ['Charity'],
+  },
+  {
+    title: 'Creator for Good',
+    description: 'Using my platforms to raise awareness for the people and issues that matter.',
+    tags: ['Awareness'],
+  },
+];
+
+// Funny / experimental things shown on the /lab page. Placeholder copy — edit freely.
+export const labItems = [
+  {
+    title: 'Experiment #001',
+    description: 'A half-baked idea I built purely for the joy of building it.',
+    tags: ['WIP'],
+  },
+  {
+    title: 'Silly Demo',
+    description: 'Something that made me laugh while making it. No promises it works.',
+    tags: ['Fun'],
+  },
 ];
 
 export const projects = [
@@ -159,6 +238,13 @@ export const projects = [
     live: '',
     featured: false,
   },
+];
+
+// Hero stats row (Outskill-style). Update values as they change.
+export const heroStats = [
+  { value: '3+', label: 'Years building software' },
+  { value: '10+', label: 'Projects shipped' },
+  { value: '25K+', label: 'TikTok followers' },
 ];
 
 export const tiktokStats = {

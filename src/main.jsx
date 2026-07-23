@@ -1,15 +1,16 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { RouterProvider } from 'react-router-dom'
 import './index.css'
-import App from './App.jsx'
+import { router } from './router'
 
-import "@fontsource/space-grotesk/400.css";
-import "@fontsource/space-grotesk/500.css";
-import "@fontsource/space-grotesk/600.css";
-import "@fontsource/space-grotesk/700.css";
+import "@fontsource/fira-sans/400.css";
+import "@fontsource/fira-sans/500.css";
+import "@fontsource/figtree/400.css";
+import "@fontsource/figtree/500.css";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>,
 )
