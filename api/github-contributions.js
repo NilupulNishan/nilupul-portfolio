@@ -73,6 +73,67 @@ const contributionQuery = `
   }
 `;
 
+const repositoryQuery = `
+  query GitHubRecentRepositories($username: String!) {
+    user(login: $username) {
+      repositories(
+        first: 3
+        privacy: PUBLIC
+        ownerAffiliations: OWNER
+        isFork: false
+        orderBy: { field: PUSHED_AT, direction: DESC }
+      ) {
+        nodes {
+          name
+          nameWithOwner
+          url
+          description
+          stargazerCount
+          forkCount
+          pushedAt
+          primaryLanguage {
+            name
+            color
+          }
+        }
+      }
+    }
+  }
+`;
+
+async function fetchRecentRepositories(token) {
+  const githubResponse = await fetch(GITHUB_GRAPHQL_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'User-Agent': 'nilupul-nishan-portfolio',
+    },
+    body: JSON.stringify({
+      query: repositoryQuery,
+      variables: { username: GITHUB_USERNAME },
+    }),
+  });
+
+  const result = await githubResponse.json();
+
+  if (!githubResponse.ok || result.errors?.length) {
+    throw new Error(result.errors?.[0]?.message || 'GitHub repository request failed.');
+  }
+
+  return (result.data?.user?.repositories?.nodes || []).map((repo) => ({
+    name: repo.name,
+    nameWithOwner: repo.nameWithOwner,
+    url: repo.url,
+    description: repo.description,
+    stars: repo.stargazerCount,
+    forks: repo.forkCount,
+    pushedAt: repo.pushedAt,
+    language: repo.primaryLanguage?.name || null,
+    languageColor: repo.primaryLanguage?.color || null,
+  }));
+}
+
 async function fetchContributionRange(token, from, to) {
   const githubResponse = await fetch(GITHUB_GRAPHQL_ENDPOINT, {
     method: 'POST',
@@ -189,6 +250,14 @@ export default async function handler(request, response) {
     const { user, collection, calendar } = await fetchContributionRange(token, from, to);
     const fullContributionSummary = await fetchFullContributionTotal(token, user.createdAt, to);
 
+    // Repositories are decorative — never fail the whole payload over them.
+    let repositories = [];
+    try {
+      repositories = await fetchRecentRepositories(token);
+    } catch {
+      repositories = [];
+    }
+
     if (process.env.NODE_ENV !== 'production') {
       const repoBreakdown = {
         commits: collection.commitContributionsByRepository?.map((item) => ({
@@ -224,6 +293,7 @@ export default async function handler(request, response) {
         pullRequestReviews: collection.totalPullRequestReviewContributions,
       },
       contributionCalendar: calendar,
+      repositories,
       range: {
         accountCreatedAt: user.createdAt,
         from: from.toISOString(),
