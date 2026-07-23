@@ -4,6 +4,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   FaArrowRight,
   FaArrowUp,
+  FaAws,
   FaBrain,
   FaCode,
   FaCodeBranch,
@@ -12,6 +13,7 @@ import {
   FaEnvelope,
   FaFacebookSquare,
   FaGithub,
+  FaGraduationCap,
   FaImage,
   FaInstagram,
   FaLinkedin,
@@ -27,6 +29,7 @@ import {
 } from 'react-icons/fa';
 import {
   SiClaude,
+  SiCoursera,
   SiCss3,
   SiDocker,
   SiExpress,
@@ -1085,6 +1088,22 @@ function Projects() {
   );
 }
 
+function getCertificateProviderIcon(provider = '') {
+  if (provider.includes('AWS')) {
+    return FaAws;
+  }
+  if (provider.includes('Coursera')) {
+    return SiCoursera;
+  }
+  if (provider.includes('DeepLearning')) {
+    return FaBrain;
+  }
+  if (provider.includes('LinkedIn')) {
+    return FaLinkedin;
+  }
+  return FaGraduationCap;
+}
+
 function Certifications() {
   const width = useViewportWidth();
   const isMobile = width < 720;
@@ -1113,7 +1132,7 @@ function Certifications() {
     <section id="certificates" className="section">
       <div className="page-shell">
         <SectionHeader eyebrow="Certifications" title="Learning milestones">
-          Courses and certificates that support my software engineering, Java, web, programming, and tooling foundation.
+          From deep learning, machine learning, and agentic AI specializations to data science, Python, and web foundations.
         </SectionHeader>
 
         <AnimatePresence mode="wait">
@@ -1122,12 +1141,15 @@ function Certifications() {
             className="card-grid certificate-grid"
           >
             {visibleCertificates.map((certificate) => (
-              <MotionCard key={certificate.link} className="content-card certificate-card">
+              <MotionCard key={certificate.title} className="content-card certificate-card">
                 <div className="certificate-topline">
                   <div className="certificate-meta">
                     <span className="certificate-date">{certificate.date}</span>
-                    <span className="certificate-provider" aria-label="LinkedIn Learning certificate">
-                      <FaLinkedin aria-hidden="true" />
+                    <span className="certificate-provider" aria-label={`${certificate.provider || 'Certificate'} provider`} title={certificate.provider}>
+                      {(() => {
+                        const ProviderIcon = getCertificateProviderIcon(certificate.provider);
+                        return <ProviderIcon aria-hidden="true" />;
+                      })()}
                     </span>
                   </div>
                   <a className="certificate-view" href={certificate.link} target="_blank" rel="noopener noreferrer" aria-label={`View ${certificate.title} certificate`}>
@@ -1139,6 +1161,9 @@ function Certifications() {
                   {certificate.skills.map((skill) => (
                     <span key={`${certificate.title}-${skill}`}>{skill}</span>
                   ))}
+                  {certificate.credentialId ? (
+                    <span className="certificate-credential" title="Enter this ID on the verification page">ID: {certificate.credentialId}</span>
+                  ) : null}
                 </div>
               </MotionCard>
             ))}
