@@ -1,4 +1,4 @@
-# Design Theme Analysis — Current Portfolio
+# Design Theme Analysis  - Current Portfolio
 
 This document reverse-engineers the visual identity, animation system, layout logic, and UI patterns of this portfolio. Use it as a reference when rebuilding with your own aesthetic.
 
@@ -6,7 +6,7 @@ This document reverse-engineers the visual identity, animation system, layout lo
 
 ## 1. Overall Vibe
 
-**Warm minimal.** Light, airy, cream-toned background with barely-there gradients. Cards float on the surface using layered shadows and glass effects rather than hard borders. Every interactive element lifts slightly on hover. Typography is tightly set with high negative letter-spacing, giving it a modern editorial feel. The palette is intentionally restrained — one blue accent, one purple, everything else is near-white and near-black.
+**Warm minimal.** Light, airy, cream-toned background with barely-there gradients. Cards float on the surface using layered shadows and glass effects rather than hard borders. Every interactive element lifts slightly on hover. Typography is tightly set with high negative letter-spacing, giving it a modern editorial feel. The palette is intentionally restrained  - one blue accent, one purple, everything else is near-white and near-black.
 
 The site feels like a premium product page crossed with a design studio portfolio. Clean, professional, slightly warm rather than cold or clinical.
 
@@ -15,23 +15,23 @@ The site feels like a premium product page crossed with a design studio portfoli
 ## 2. Color System
 
 ### Background
-- Page background: `#fbfaf7` — warm off-white, not pure white
+- Page background: `#fbfaf7`  - warm off-white, not pure white
 - Body builds depth with layered radial gradients:
   - Blue radial blob top-left: `rgba(37, 99, 235, 0.075)` at `34rem`
   - Purple radial blob top-right: `rgba(124, 58, 237, 0.055)` at `32rem`
   - Linear base: `linear-gradient(180deg, #fbfaf7 0%, #f7f5ef 100%)`
-- Cards: `rgba(255, 255, 255, 0.88)` — frosted glass on top of the gradient
+- Cards: `rgba(255, 255, 255, 0.88)`  - frosted glass on top of the gradient
 
 ### Text
-- Primary headings: `#121212`, `#161616`, `#171717` — near-black, not pure black
-- Body text: `#626267`, `#5b5b5f`, `#68686d` — cool gray, slightly muted
-- Secondary/meta: `#77777c`, `#85858a` — lighter gray
+- Primary headings: `#121212`, `#161616`, `#171717`  - near-black, not pure black
+- Body text: `#626267`, `#5b5b5f`, `#68686d`  - cool gray, slightly muted
+- Secondary/meta: `#77777c`, `#85858a`  - lighter gray
 - Tertiary/hint: `#8a8a8e`, `#8a8a8f`
 - Placeholder: `#8a8a8f`
 
 ### Accent
-- Primary accent: `#2563eb` — Tailwind `blue-500`, used for links, eyebrows, focus rings, active nav underlines, date badges, education affiliation text
-- Secondary accent: `rgba(124, 58, 237, ...)` — violet/purple, used only in background blobs
+- Primary accent: `#2563eb`  - Tailwind `blue-500`, used for links, eyebrows, focus rings, active nav underlines, date badges, education affiliation text
+- Secondary accent: `rgba(124, 58, 237, ...)`  - violet/purple, used only in background blobs
 - TikTok brand line: `linear-gradient(90deg, rgba(37, 244, 238, 0.72), #171717 48%, rgba(254, 44, 85, 0.72))`
 - Mobile tap highlight: `rgba(37, 99, 235, 0.12)`
 
@@ -68,7 +68,7 @@ The site feels like a premium product page crossed with a design studio portfoli
 - Level 4: `#216e39`
 - Cell inner shadow: `inset 0 0 0 1px rgba(27, 31, 36, 0.04)`
 
-**GitHub Contribution (dark mode) — completely different palette:**
+**GitHub Contribution (dark mode)  - completely different palette:**
 - Level 0: `#161b22`
 - Level 1: `#0e4429`
 - Level 2: `#006d32`
@@ -89,7 +89,7 @@ The site feels like a premium product page crossed with a design studio portfoli
 ## 3. Typography
 
 ### Font
-- **Outfit** — Google Fonts variable font. Modern, geometric, friendly but structured.
+- **Outfit**  - Google Fonts variable font. Modern, geometric, friendly but structured.
 - Fallback: `Arial, Helvetica, sans-serif`
 
 ### Size Scale (fluid, clamp-based)
@@ -98,15 +98,15 @@ The site feels like a premium product page crossed with a design studio portfoli
 | Hero H1 | `clamp(3.9rem, 8.4vw, 7.2rem)` | 800 | `-0.075em` | 0.88 |
 | Section H2 | `clamp(2.2rem, 4.5vw, 4rem)` | 780 | `-0.055em` | 1.02 |
 | Hero subtitle | `clamp(1.35rem, 3vw, 2.1rem)` | 680 | `-0.025em` | 1.16 |
-| Card H3 | `1.28rem` | 740 | `-0.02em` | — |
+| Card H3 | `1.28rem` | 740 | `-0.02em` |  - |
 | Identity H3 | `clamp(0.98rem, 1.25vw, 1.08rem)` | 760 | `-0.025em` | 1.5 |
-| Body | `1rem` | 680 | — | 1.75 |
-| Body large | `1.08rem` | 680 | — | 1.7 |
-| Tags/badges | `0.73–0.84rem` | 720–740 | — | — |
-| Eyebrow label | `0.78rem` | 800 | `0.16em` | — |
+| Body | `1rem` | 680 |  - | 1.75 |
+| Body large | `1.08rem` | 680 |  - | 1.7 |
+| Tags/badges | `0.73–0.84rem` | 720–740 |  - |  - |
+| Eyebrow label | `0.78rem` | 800 | `0.16em` |  - |
 
 ### Font Weight Strategy
-The site avoids standard 400/700 weight jumps. Instead it uses intermediate values (650, 680, 720, 740, 760, 780, 800, 860) via Outfit's variable weight axis. This creates subtlety — the difference between a card title and body copy feels intentional rather than mechanical.
+The site avoids standard 400/700 weight jumps. Instead it uses intermediate values (650, 680, 720, 740, 760, 780, 800, 860) via Outfit's variable weight axis. This creates subtlety  - the difference between a card title and body copy feels intentional rather than mechanical.
 
 - `650`: Navigation links
 - `680`: Body text, descriptions
@@ -123,7 +123,7 @@ Headings have very tight letter-spacing (`-0.055em` to `-0.075em`). This is a ha
 ## 4. Animation System
 
 ### Library
-Framer Motion v12. All animations use the `whileInView` pattern with `once: true` — elements animate in once on scroll, never repeat.
+Framer Motion v12. All animations use the `whileInView` pattern with `once: true`  - elements animate in once on scroll, never repeat.
 
 ### The `useLeanMotion()` Hook
 This is the core performance decision. It detects mobile/touch devices via:
@@ -155,7 +155,7 @@ Hero:    staggerChildren 0.11s, delayChildren 0.08s
 
 **Card hover:**
 ```
-translateY(-4px), scale — none
+translateY(-4px), scale  - none
 Transition: 0.22s, easing [0.22, 1, 0.36, 1]
 ```
 
@@ -181,10 +181,10 @@ Duration: 0.16–0.18s
 ```
 
 **Navigation active tab:**
-Uses Framer Motion `layoutId` — the active underline pill slides between nav items smoothly on click.
+Uses Framer Motion `layoutId`  - the active underline pill slides between nav items smoothly on click.
 
 ### Easing Philosophy
-The custom curve `[0.22, 1, 0.36, 1]` is a strong ease-out — fast start, graceful finish. Used on all interactive elements. Standard `easeOut` is the fallback for mobile.
+The custom curve `[0.22, 1, 0.36, 1]` is a strong ease-out  - fast start, graceful finish. Used on all interactive elements. Standard `easeOut` is the fallback for mobile.
 
 ### Reduced Motion
 All durations collapse to `0.01ms`. Scroll behavior becomes `auto`. No transforms on hover. This is handled via both the CSS `prefers-reduced-motion` media query and Framer's `useReducedMotion()` hook.
@@ -193,21 +193,21 @@ All durations collapse to `0.01ms`. Scroll behavior becomes `auto`. No transform
 
 ## 5. Section Structure (Top → Bottom)
 
-1. **Navbar** — Fixed, sticky. Logo left, nav links center/right, theme toggle, mobile hamburger
-2. **Hero** — Full-viewport. Name animated word-by-word. Profile photo right. Metadata badges. Two CTAs
-3. **About** — 4 cards in a grid. Each card = icon + short identity statement
-4. **Education** — Timeline cards. Institution logo, degree, grades, tags
-5. **Experience** — Work history cards. Company logo, role, date badge, description, skill tags
-6. **Tech Stack** — 3-column grid of categorized skill chips
-7. **Projects** — Card grid with preview bg, title, tags, GitHub/demo links. Desktop pagination (3/page), mobile show-more (2/batch)
-8. **GitHub Activity** — 52-week contribution heatmap. Stats. Cached via serverless function
-9. **Certifications** — Card grid. Responsive page sizes (3/4/6). Mobile show-more (3/batch)
-10. **TikTok Creator** — Two-column. Text + embedded TikTok or fallback CTA
-11. **Spotify Playlist** — Featured playlist iframe + stats
-12. **Promotions Form** — Collaboration inquiry form. WhatsApp integration
-13. **Contact** — Final CTA section. WhatsApp + Email buttons. Social grid
-14. **Footer** — Copyright only
-15. **Back-to-top** — Fixed circle button, appears after scroll
+1. **Navbar**  - Fixed, sticky. Logo left, nav links center/right, theme toggle, mobile hamburger
+2. **Hero**  - Full-viewport. Name animated word-by-word. Profile photo right. Metadata badges. Two CTAs
+3. **About**  - 4 cards in a grid. Each card = icon + short identity statement
+4. **Education**  - Timeline cards. Institution logo, degree, grades, tags
+5. **Experience**  - Work history cards. Company logo, role, date badge, description, skill tags
+6. **Tech Stack**  - 3-column grid of categorized skill chips
+7. **Projects**  - Card grid with preview bg, title, tags, GitHub/demo links. Desktop pagination (3/page), mobile show-more (2/batch)
+8. **GitHub Activity**  - 52-week contribution heatmap. Stats. Cached via serverless function
+9. **Certifications**  - Card grid. Responsive page sizes (3/4/6). Mobile show-more (3/batch)
+10. **TikTok Creator**  - Two-column. Text + embedded TikTok or fallback CTA
+11. **Spotify Playlist**  - Featured playlist iframe + stats
+12. **Promotions Form**  - Collaboration inquiry form. WhatsApp integration
+13. **Contact**  - Final CTA section. WhatsApp + Email buttons. Social grid
+14. **Footer**  - Copyright only
+15. **Back-to-top**  - Fixed circle button, appears after scroll
 
 ---
 
@@ -385,7 +385,7 @@ back-to-top:          60
 
 ---
 
-## 11. What Makes This Design "Not Yours" — Things to Change
+## 11. What Makes This Design "Not Yours"  - Things to Change
 
 The following are the most identity-defining choices in this design. Changing these will completely shift the vibe:
 
@@ -398,13 +398,13 @@ Current: Warm cream + blue accent. Very neutral, professional.
   - **Gradient-heavy**: Rich gradient backgrounds instead of the subtle blob system
 
 ### 🔤 Typography
-Current: Outfit — friendly, geometric, modern.
+Current: Outfit  - friendly, geometric, modern.
 - Swap for something with more personality:
-  - **Clash Display / Cabinet Grotesk** — editorial, bold
-  - **Syne** — futuristic, geometric
-  - **Space Grotesk** — techy, structured
-  - **Playfair Display** — elegant, editorial contrast (serif for headings)
-  - **DM Serif / Cormorant** — luxury feel
+  - **Clash Display / Cabinet Grotesk**  - editorial, bold
+  - **Syne**  - futuristic, geometric
+  - **Space Grotesk**  - techy, structured
+  - **Playfair Display**  - elegant, editorial contrast (serif for headings)
+  - **DM Serif / Cormorant**  - luxury feel
 - Also consider: removing the extreme negative letter-spacing for a more open feel, or pushing it even further for an intense compressed look.
 
 ### 📐 Layout Structure
@@ -412,7 +412,7 @@ Current: Sequential vertical sections, everything stacked linearly.
 - Alternatives:
   - **Horizontal scroll panels** for projects
   - **Bento grid** layout for about/skills
-  - **Asymmetric grids** — off-center text + large visuals
+  - **Asymmetric grids**  - off-center text + large visuals
   - **Full-bleed sections** with edge-to-edge backgrounds
 
 ### 🏗️ Card Style
@@ -451,8 +451,8 @@ Current: Gentle fade-up reveals, subtle hover lifts. Professional, unobtrusive.
 - [ ] Adjust the heading letter-spacing to match your font's personality
 - [ ] Pick your card style (glass / bordered / flat)
 - [ ] Choose your animation energy level (subtle / moderate / theatrical)
-- [ ] Update all brand copy — every label, heading, section name
+- [ ] Update all brand copy  - every label, heading, section name
 
 ---
 
-*This is a solid, well-crafted foundation. The main weakness to overcome when making it yours: it plays very safe visually. The warmth and subtlety work, but every decision is intentionally inoffensive. Your version should make a choice that could divide opinion — that's what gives a portfolio a personality.*
+*This is a solid, well-crafted foundation. The main weakness to overcome when making it yours: it plays very safe visually. The warmth and subtlety work, but every decision is intentionally inoffensive. Your version should make a choice that could divide opinion  - that's what gives a portfolio a personality.*

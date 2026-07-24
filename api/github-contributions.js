@@ -250,7 +250,7 @@ export default async function handler(request, response) {
     const { user, collection, calendar } = await fetchContributionRange(token, from, to);
     const fullContributionSummary = await fetchFullContributionTotal(token, user.createdAt, to);
 
-    // Repositories are decorative — never fail the whole payload over them.
+    // Repositories are decorative  - never fail the whole payload over them.
     let repositories = [];
     try {
       repositories = await fetchRecentRepositories(token);
