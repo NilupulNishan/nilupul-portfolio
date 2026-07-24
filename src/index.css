@@ -103,14 +103,18 @@
 }
 
 html {
-  overflow-x: clip;
+  /* No overflow-x clip here: an `overflow` value other than `visible` on an
+     ancestor clips the backdrop that the sticky header's backdrop-filter
+     samples, silently killing the navbar glass blur. Horizontal overflow is
+     instead prevented at the source (contained rails layout + .scroll-x). */
+  max-width: 100%;
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
+  max-width: 100%;
   margin: 0;
-  overflow-x: clip;
   background: var(--bg-page);
   font-family: var(--font-body);
 }
