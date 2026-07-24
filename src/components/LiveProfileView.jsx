@@ -4,7 +4,7 @@ import { brands } from '../data/portfolio';
 import PlatformEmbed, { isEmbeddable } from './PlatformEmbed';
 
 // A unified "profile view" that pulls each brand's live content straight from
-// the platforms via their official embeds  - no API keys required. Only the
+// the platforms via their official embeds - no API keys required. Only the
 // active brand's embeds mount, keeping the page light.
 export default function LiveProfileView() {
   const [active, setActive] = useState(0);
@@ -17,7 +17,7 @@ export default function LiveProfileView() {
     <section id="live-profile" className="section">
       <div className="page-shell">
         <SectionHeader eyebrow="Live profile" title="Straight from my platforms">
-          Pick a brand to see its latest content pulled live from each platform  - always current, because
+          Pick a brand to see its latest content pulled live from each platform - always current, because
           each platform serves its own feed.
         </SectionHeader>
 
@@ -50,7 +50,7 @@ export default function LiveProfileView() {
             </div>
           ) : (
             <p className="embed-fallback">
-              No embeddable feed for this brand yet  - open it directly on its platforms below.
+              No embeddable feed for this brand yet - open it directly on its platforms below.
             </p>
           )}
 

@@ -84,7 +84,7 @@ const githubContributionSummary = {
 const projectDesktopPageSize = 3;
 const projectMobileBatchSize = 2;
 
-// Light mode is hidden for now  - flip to true to restore the theme toggle.
+// Light mode is hidden for now - flip to true to restore the theme toggle.
 // All light-mode CSS ([data-theme='light']) and logic is left intact.
 const LIGHT_MODE_ENABLED = false;
 
@@ -448,7 +448,9 @@ function Navbar() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem('theme-v2', theme);
+    if (LIGHT_MODE_ENABLED) {
+      localStorage.setItem('theme-v2', theme);
+    }
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (themeColorMeta) {
       themeColorMeta.setAttribute('content', theme === 'dark' ? '#08090a' : '#ffffff');
@@ -710,8 +712,8 @@ function Hero() {
         <img
           src={heroBackdrop}
           alt=""
-          width="2571"
-          height="2571"
+          width="1024"
+          height="1536"
           fetchPriority="high"
           decoding="async"
         />
@@ -735,7 +737,7 @@ function Hero() {
               ))}
             </Motion.h1>
             <Motion.p className="hero-description" variants={leanMotion ? mobileFadeUp : fadeUp}>
-              I build intelligent, user-focused software across AI, web, mobile, and full-stack development  - from Sri Lanka to wherever the work matters.
+              I build intelligent, user-focused software across AI, web, mobile, and full-stack development - from Sri Lanka to wherever the work matters.
             </Motion.p>
 
             <Motion.div className="hero-actions" variants={leanMotion ? mobileFadeUp : fadeUp}>
@@ -777,7 +779,7 @@ function About() {
     {
       title: 'Entrepreneur',
       meta: 'Mindset',
-      description: 'Thinking beyond code  - building things with real-world impact and business sense.',
+      description: 'Thinking beyond code - building things with real-world impact and business sense.',
     },
     {
       title: 'Content Creator',
@@ -828,7 +830,7 @@ function Experience() {
         {
           role: 'Associate AI/ML Engineer',
           meta: 'Full-time · Feb 2026 - Present · 5 mos',
-          description: 'Building and shipping production AI/ML solutions  - extending Retrieval-Augmented Generation (RAG) pipelines into real-time, context-aware enterprise features.',
+          description: 'Building and shipping production AI/ML solutions - extending Retrieval-Augmented Generation (RAG) pipelines into real-time, context-aware enterprise features.',
           tags: ['Large Language Models (LLM)', 'RAG', 'PostgreSQL'],
         },
         {
@@ -911,7 +913,6 @@ function Education() {
           title: 'G.C.E. Advanced Level Examination',
           meta: '2020',
           description: 'Physical Science Stream - ICT · Combined Mathematics · Physics',
-          // description: 'Physical Science Stream  - ICT: A · Combined Mathematics: C · Physics: C',
         },
       ],
     },
@@ -1081,11 +1082,11 @@ function getCertificateProviderIcon(provider = '') {
   if (provider.includes('AWS')) {
     return FaAws;
   }
-  if (provider.includes('Coursera')) {
-    return SiCoursera;
-  }
   if (provider.includes('DeepLearning')) {
     return FaBrain;
+  }
+  if (provider.includes('Coursera')) {
+    return SiCoursera;
   }
   if (provider.includes('LinkedIn')) {
     return FaLinkedin;
@@ -1797,7 +1798,7 @@ function Footer() {
         <div className="footer-grid">
           <div className="footer-cell footer-brand">
             <strong>Nilupul Nishan</strong>
-            <p>AI/ML Engineer, entrepreneur, and content creator from Sri Lanka  - building intelligent, user-focused software.</p>
+            <p>AI/ML Engineer, entrepreneur, and content creator from Sri Lanka - building intelligent, user-focused software.</p>
           </div>
           <nav className="footer-cell footer-nav" aria-label="Footer navigation">
             <p className="footer-heading">Explore</p>

@@ -108,7 +108,7 @@ export const logoLoopItems = [
 // platform links. Leave a link `href` empty ('') and it renders as "coming soon".
 export const brands = [
   {
-    name: 'Nilupul Nishan  - AI & Tech',
+    name: 'Nilupul Nishan - AI & Tech',
     category: 'English · Tech',
     description: 'AI/ML, tech, and creator insights in English across professional and social platforms.',
     links: [
@@ -118,9 +118,9 @@ export const brands = [
     ],
   },
   {
-    name: 'Nilupul Nishan  - Real Talk',
+    name: 'Nilupul Nishan - Real Talk',
     category: 'Sinhala · Motivation',
-    description: 'Candid, relatable motivation in Sinhala  - real-life moments turned into practical tips for Sri Lankan youth.',
+    description: 'Candid, relatable motivation in Sinhala - real-life moments turned into practical tips for Sri Lankan youth.',
     links: [
       { type: 'facebook', href: 'https://www.facebook.com/mr.nilupul.2k' },
       { type: 'tiktok', href: 'https://www.tiktok.com/@mrnilupul2k' },
@@ -129,7 +129,7 @@ export const brands = [
   {
     name: 'Magha Fitness',
     category: 'Fitness',
-    description: 'Fitness brand  - workouts, routines, and healthy-lifestyle content.',
+    description: 'Fitness brand - workouts, routines, and healthy-lifestyle content.',
     links: [
       { type: 'facebook', href: 'https://www.facebook.com/magha.fitzone' },
       { type: 'instagram', href: '' },
@@ -140,7 +140,7 @@ export const brands = [
     name: 'Emography',
     category: 'Photography',
     logo: '/brands/emography-black.jpg',
-    description: 'Photography brand  - capturing moments, emotion, and story through the lens.',
+    description: 'Photography brand - capturing moments, emotion, and story through the lens.',
     links: [
       { type: 'facebook', href: 'https://www.facebook.com/emography25' },
       { type: 'portfolio', href: 'https://emography.pixieset.com/' },
@@ -148,7 +148,7 @@ export const brands = [
   },
 ];
 
-// Philanthropy / legacy work shown on the /afterlife page. Placeholder copy  - edit freely.
+// Philanthropy / legacy work shown on the /afterlife page. Placeholder copy - edit freely.
 export const afterlifeItems = [
   {
     title: 'Tech Education Outreach',
@@ -167,7 +167,7 @@ export const afterlifeItems = [
   },
 ];
 
-// Funny / experimental things shown on the /lab page. Placeholder copy  - edit freely.
+// Funny / experimental things shown on the /lab page. Placeholder copy - edit freely.
 export const labItems = [
   {
     title: 'Experiment #001',

@@ -12,7 +12,7 @@ import {
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function Home() {
-  useDocumentTitle('Nilupul Nishan  - AI/ML Engineer & Content Creator');
+  useDocumentTitle('Nilupul Nishan - AI/ML Engineer & Content Creator');
 
   return (
     <>

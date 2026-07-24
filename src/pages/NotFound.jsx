@@ -4,7 +4,7 @@ import { SectionHeader } from '../sections';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 export default function NotFound() {
-  useDocumentTitle('Page not found  - Nilupul Nishan');
+  useDocumentTitle('Page not found - Nilupul Nishan');
 
   return (
     <section className="section">

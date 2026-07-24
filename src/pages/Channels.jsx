@@ -12,7 +12,7 @@ import { brands } from '../data/portfolio';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 import LiveProfileView from '../components/LiveProfileView';
 
-// Pixieset has no brand icon in react-icons  - use its serif "P" wordmark.
+// Pixieset has no brand icon in react-icons - use its serif "P" wordmark.
 function PixiesetMark(props) {
   return (
     <span className="brand-letter-mark" {...props}>P</span>
@@ -40,14 +40,14 @@ const platformLabel = {
 };
 
 export default function Channels() {
-  useDocumentTitle('Channels  - Nilupul Nishan');
+  useDocumentTitle('Channels - Nilupul Nishan');
 
   return (
     <>
       <section id="channels" className="section">
         <div className="page-shell">
           <SectionHeader eyebrow="Channels" title="My brands & content">
-            The brands and content series I create under  - each with its own home across platforms.
+            The brands and content series I create under - each with its own home across platforms.
           </SectionHeader>
 
           <StaggerContainer className="card-grid tech-grid">
