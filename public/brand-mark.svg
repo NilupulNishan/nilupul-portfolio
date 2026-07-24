@@ -1,14 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TG monogram">
-  <rect width="64" height="64" rx="15" fill="#f8f4ec"/>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="13.5" fill="none" stroke="#d7d0c4" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NN monogram">
+  <rect width="64" height="64" rx="15" fill="#121212"/>
   <text
     x="32"
-    y="38"
-    fill="#161616"
-    font-family="Arial, Helvetica, sans-serif"
-    font-size="27"
-    font-weight="800"
+    y="44"
     text-anchor="middle"
-    letter-spacing="-2"
-  >TG</text>
+    font-family="'Arial Black', Arial, Helvetica, sans-serif"
+    font-size="30"
+    font-weight="900"
+    letter-spacing="-1"
+  ><tspan fill="#f8f4ec">N</tspan><tspan fill="#ff6a00">N</tspan></text>
 </svg>
