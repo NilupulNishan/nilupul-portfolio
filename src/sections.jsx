@@ -57,7 +57,7 @@ import {
 } from 'react-icons/si';
 import { DiJava, DiPython } from 'react-icons/di';
 import { VscAzure, VscVscode } from 'react-icons/vsc';
-import profilePic from './assets/profile/profile_pic2.jpg';
+import heroBackdrop from './assets/profile/profile_pic3.jpg';
 import certifications from './data/certifications.json';
 import {
   heroStats,
@@ -83,6 +83,10 @@ const githubContributionSummary = {
 
 const projectDesktopPageSize = 3;
 const projectMobileBatchSize = 2;
+
+// Light mode is hidden for now  - flip to true to restore the theme toggle.
+// All light-mode CSS ([data-theme='light']) and logic is left intact.
+const LIGHT_MODE_ENABLED = false;
 
 const sectionToNavMap = {
   home: '#home',
@@ -429,7 +433,9 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeNav, setActiveNav] = useState('#home');
-  const [theme, setTheme] = useState(() => localStorage.getItem('theme-v2') || 'dark');
+  const [theme, setTheme] = useState(() => (
+    LIGHT_MODE_ENABLED ? localStorage.getItem('theme-v2') || 'dark' : 'dark'
+  ));
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
   const navigate = useNavigate();
@@ -629,14 +635,16 @@ function Navbar() {
             >
               Get in touch
             </a>
-            <button
-              className="theme-toggle"
-              type="button"
-              onClick={() => setTheme((value) => (value === 'light' ? 'dark' : 'light'))}
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              {theme === 'light' ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
-            </button>
+            {LIGHT_MODE_ENABLED ? (
+              <button
+                className="theme-toggle"
+                type="button"
+                onClick={() => setTheme((value) => (value === 'light' ? 'dark' : 'light'))}
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
+              </button>
+            ) : null}
 
             <button
               className={`menu-button ${open ? 'is-open' : ''}`}
@@ -689,29 +697,25 @@ function Navbar() {
 function Hero() {
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
-  const heroImageMotion = reduceMotion
-    ? false
-    : leanMotion
-      ? { opacity: 0, y: 14, scale: 0.99, filter: 'blur(6px)' }
-      : { opacity: 0, y: 24, scale: 0.96, filter: 'blur(8px)' };
-  const heroImageTransition = reduceMotion
-    ? { duration: 0 }
-    : leanMotion
-      ? {
-        opacity: { duration: 0.38, ease: 'easeOut', delay: 0.08 },
-        scale: { duration: 0.38, ease: 'easeOut', delay: 0.08 },
-        y: { duration: 0.38, ease: 'easeOut', delay: 0.08 },
-        filter: { duration: 0.38, ease: 'easeOut', delay: 0.08 },
-      }
-      : {
-      opacity: { duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.08 },
-      scale: { duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.08 },
-      y: { duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.08 },
-      filter: { duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.08 },
-    };
 
   return (
     <section id="home" className="hero-section">
+      <Motion.div
+        className="hero-backdrop"
+        aria-hidden="true"
+        initial={reduceMotion ? false : { opacity: 0, scale: leanMotion ? 1 : 1.04 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={reduceMotion ? { duration: 0 } : { duration: leanMotion ? 0.5 : 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <img
+          src={heroBackdrop}
+          alt=""
+          width="2571"
+          height="2571"
+          fetchPriority="high"
+          decoding="async"
+        />
+      </Motion.div>
       <div className="page-shell">
         <div className="hero-layout">
           <Motion.div className="hero-copy" variants={leanMotion ? mobileHeroStagger : heroStagger} initial={reduceMotion ? false : 'hidden'} animate="visible">
@@ -731,7 +735,7 @@ function Hero() {
               ))}
             </Motion.h1>
             <Motion.p className="hero-description" variants={leanMotion ? mobileFadeUp : fadeUp}>
-              I build intelligent, user-focused software across AI, web, mobile, and full-stack development — from Sri Lanka to wherever the work matters.
+              I build intelligent, user-focused software across AI, web, mobile, and full-stack development  - from Sri Lanka to wherever the work matters.
             </Motion.p>
 
             <Motion.div className="hero-actions" variants={leanMotion ? mobileFadeUp : fadeUp}>
@@ -742,22 +746,6 @@ function Hero() {
                 Contact Me
               </a>
             </Motion.div>
-          </Motion.div>
-
-          <Motion.div
-            className="hero-portrait"
-            initial={heroImageMotion}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            transition={heroImageTransition}
-          >
-            <img
-              src={profilePic}
-              alt="Nilupul Nishan, AI/ML Engineer and entrepreneur from Sri Lanka"
-              width="977"
-              height="976"
-              fetchPriority="high"
-              decoding="async"
-            />
           </Motion.div>
         </div>
 
@@ -789,7 +777,7 @@ function About() {
     {
       title: 'Entrepreneur',
       meta: 'Mindset',
-      description: 'Thinking beyond code — building things with real-world impact and business sense.',
+      description: 'Thinking beyond code  - building things with real-world impact and business sense.',
     },
     {
       title: 'Content Creator',
@@ -840,7 +828,7 @@ function Experience() {
         {
           role: 'Associate AI/ML Engineer',
           meta: 'Full-time · Feb 2026 - Present · 5 mos',
-          description: 'Building and shipping production AI/ML solutions — extending Retrieval-Augmented Generation (RAG) pipelines into real-time, context-aware enterprise features.',
+          description: 'Building and shipping production AI/ML solutions  - extending Retrieval-Augmented Generation (RAG) pipelines into real-time, context-aware enterprise features.',
           tags: ['Large Language Models (LLM)', 'RAG', 'PostgreSQL'],
         },
         {
@@ -913,7 +901,7 @@ function Education() {
       monogram: 'USJP',
     },
     {
-      institution: 'Kuruwita Central College - Ambalangoda',
+      institution: 'Kuruwita Central College - Ratnapura',
       degree: 'Completed secondary education, then followed the Physical Science stream for A/Ls with ICT, Combined Mathematics, and Physics.',
       date: '2015 - 2020',
       logo: '/education/kcc-logo.png',
@@ -922,7 +910,8 @@ function Education() {
         {
           title: 'G.C.E. Advanced Level Examination',
           meta: '2020',
-          description: 'Physical Science Stream — ICT: A · Combined Mathematics: C · Physics: C',
+          description: 'Physical Science Stream - ICT · Combined Mathematics · Physics',
+          // description: 'Physical Science Stream  - ICT: A · Combined Mathematics: C · Physics: C',
         },
       ],
     },
@@ -1339,7 +1328,7 @@ function GitHubActivity() {
     };
   }, []);
 
-  const formatCount = (value) => (typeof value === 'number' ? new Intl.NumberFormat('en-US').format(value) : '—');
+  const formatCount = (value) => (typeof value === 'number' ? new Intl.NumberFormat('en-US').format(value) : ' -');
 
   const githubStatTiles = [
     { icon: FaCode, value: githubData.totals?.commits, label: 'Commits' },
@@ -1808,7 +1797,7 @@ function Footer() {
         <div className="footer-grid">
           <div className="footer-cell footer-brand">
             <strong>Nilupul Nishan</strong>
-            <p>AI/ML Engineer, entrepreneur, and content creator from Sri Lanka — building intelligent, user-focused software.</p>
+            <p>AI/ML Engineer, entrepreneur, and content creator from Sri Lanka  - building intelligent, user-focused software.</p>
           </div>
           <nav className="footer-cell footer-nav" aria-label="Footer navigation">
             <p className="footer-heading">Explore</p>

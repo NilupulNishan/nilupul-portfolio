@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Design tokens — Outskill template, orange accent.
+   Design tokens  - Outskill template, orange accent.
    Dark is the default theme; [data-theme='light'] overrides.
    ============================================================ */
 :root {
@@ -32,7 +32,7 @@
   --line-soft: rgba(255, 255, 255, 0.16);
   --line-strong: rgba(255, 255, 255, 0.4);
 
-  /* signature accent (orange — takes Outskill's lime role) */
+  /* signature accent (orange  - takes Outskill's lime role) */
   --accent: #ff7d1f;
   --accent-strong: #ff6a00;
   --accent-contrast: #1c0c00;
@@ -185,7 +185,7 @@ iframe {
 }
 
 /* ============================================================
-   Blueprint rails — every band is hairline-bounded; the column
+   Blueprint rails  - every band is hairline-bounded; the column
    carries continuous 1px vertical rules down the page.
    ============================================================ */
 .page-shell {
@@ -205,7 +205,7 @@ iframe {
 }
 
 /* ============================================================
-   Header / navbar — transparent over the page, glass on scroll
+   Header / navbar  - transparent over the page, glass on scroll
    ============================================================ */
 .site-header {
   position: sticky;
@@ -594,16 +594,64 @@ iframe {
 }
 
 /* ============================================================
-   Hero — full-height band inside the rails
+   Hero  - full-height band inside the rails
    ============================================================ */
 .hero-section {
   position: relative;
   display: flex;
   min-height: calc(100svh - 71px);
+  overflow: hidden;
   border-top: none;
 }
 
+/* Full-bleed cinematic backdrop  - figure anchored right, washed into the ground */
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-backdrop img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  height: 100%;
+  min-width: 44%;
+  object-fit: cover;
+  object-position: 62% 14%;
+  filter: grayscale(1) brightness(1) contrast(1.08);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+
+[data-theme='light'] .hero-backdrop img {
+  filter: grayscale(1) brightness(1.02) contrast(1.02);
+}
+
+.hero-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--bg-page) 14%,
+      color-mix(in srgb, var(--bg-page) 72%, transparent) 44%,
+      color-mix(in srgb, var(--bg-page) 24%, transparent) 70%,
+      color-mix(in srgb, var(--bg-page) 36%, transparent) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-page) 30%, transparent) 0%,
+      transparent 42%,
+      var(--bg-page) 100%
+    );
+}
+
 .hero-section > .page-shell {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -613,7 +661,7 @@ iframe {
 
 .hero-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: clamp(36px, 5vw, 64px);
 }
@@ -661,22 +709,6 @@ iframe {
   margin-top: 30px;
 }
 
-.hero-portrait {
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius);
-  background: var(--bg-card);
-}
-
-.hero-portrait img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
-  object-position: 50% 18%;
-}
-
 .hero-stats {
   display: flex;
   flex-wrap: wrap;
@@ -711,7 +743,7 @@ iframe {
 }
 
 /* ============================================================
-   Type scale — eyebrow + section headers
+   Type scale  - eyebrow + section headers
    ============================================================ */
 .eyebrow,
 .section-header p {
@@ -838,7 +870,7 @@ iframe {
 }
 
 /* ============================================================
-   Cards — flat, hairline-bordered, 2px corners
+   Cards  - flat, hairline-bordered, 2px corners
    ============================================================ */
 .about-card,
 .experience-card,
@@ -1705,7 +1737,7 @@ iframe {
 }
 
 /* ============================================================
-   GitHub activity — calendar recolored to accent intensity
+   GitHub activity  - calendar recolored to accent intensity
    ============================================================ */
 .github-card {
   overflow: hidden;
@@ -2737,7 +2769,7 @@ iframe {
 }
 
 /* ============================================================
-   Footer — bordered grid
+   Footer  - bordered grid
    ============================================================ */
 .site-footer {
   border-top: 1px solid var(--line-soft);
@@ -2860,7 +2892,7 @@ iframe {
 }
 
 /* ============================================================
-   Live profile view — brand switcher + platform embeds
+   Live profile view  - brand switcher + platform embeds
    ============================================================ */
 .brand-tabs {
   display: flex;
@@ -2962,7 +2994,6 @@ iframe {
     display: flex;
   }
 
-  .hero-layout,
   .experience-card,
   .tiktok-layout,
   .spotify-feature-card,
@@ -2975,8 +3006,20 @@ iframe {
     min-height: auto;
   }
 
-  .hero-portrait {
-    max-width: 340px;
+  .hero-backdrop::after {
+    background:
+      linear-gradient(
+        90deg,
+        var(--bg-page) 8%,
+        color-mix(in srgb, var(--bg-page) 78%, transparent) 55%,
+        color-mix(in srgb, var(--bg-page) 46%, transparent) 100%
+      ),
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--bg-page) 30%, transparent) 0%,
+        transparent 42%,
+        var(--bg-page) 100%
+      );
   }
 
   .tech-grid,
@@ -3031,8 +3074,24 @@ iframe {
     padding-top: 40px;
   }
 
-  .hero-portrait {
-    display: none;
+  .hero-backdrop img {
+    min-width: 100%;
+    object-position: 62% 0%;
+    filter: grayscale(1) brightness(0.4) contrast(1.05);
+    mask-image: none;
+  }
+
+  [data-theme='light'] .hero-backdrop img {
+    filter: grayscale(1) brightness(1.05) contrast(1);
+  }
+
+  .hero-backdrop::after {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--bg-page) 62%, transparent) 0%,
+      color-mix(in srgb, var(--bg-page) 48%, transparent) 55%,
+      var(--bg-page) 100%
+    );
   }
 
   .hero-stats {
@@ -3409,7 +3468,7 @@ iframe {
 }
 
 /* ============================================================
-   Touch / performance guards — no blurs, shorter transitions
+   Touch / performance guards  - no blurs, shorter transitions
    ============================================================ */
 @media (max-width: 720px), (hover: none), (pointer: coarse) {
   .site-header-scrolled,
