@@ -151,19 +151,19 @@ export const brands = [
 // Philanthropy / legacy work shown on the /afterlife page. Placeholder copy - edit freely.
 export const afterlifeItems = [
   {
+    title: 'Magha Philanthropy',
+    description: 'Charitable initiatives under the Magha name — giving back to the communities and causes that matter most.',
+    tags: ['Charity', 'Community'],
+  },
+  {
     title: 'Tech Education Outreach',
     description: 'Free coding and AI-literacy sessions for students and young creators in Sri Lanka.',
     tags: ['Education', 'Mentoring'],
   },
   {
-    title: 'Community Giving',
-    description: 'Supporting local causes and charitable initiatives that are close to my heart.',
-    tags: ['Charity'],
-  },
-  {
-    title: 'Creator for Good',
-    description: 'Using my platforms to raise awareness for the people and issues that matter.',
-    tags: ['Awareness'],
+    title: 'Blood Donor',
+    description: 'A regular blood donor — showing up for people in need, one donation at a time.',
+    tags: ['Health', 'Giving'],
   },
 ];
 
