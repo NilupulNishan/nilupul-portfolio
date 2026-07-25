@@ -10,6 +10,7 @@ export default function Lab() {
       intro="A playground for half-baked ideas, silly demos, and experiments that exist purely for the fun of it."
       items={labItems}
       docTitle="Lab - Funny & Experimental | Nilupul Nishan"
+      comingSoon
     />
   );
 }

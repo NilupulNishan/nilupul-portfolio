@@ -292,7 +292,7 @@ function StaggerContainer({ children, className = '' }) {
   );
 }
 
-function MotionCard({ children, className = '' }) {
+function MotionCard({ children, className = '', ...rest }) {
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
 
@@ -305,6 +305,7 @@ function MotionCard({ children, className = '' }) {
       }}
       whileTap={reduceMotion ? undefined : { scale: 0.995 }}
       transition={{ duration: leanMotion ? 0.18 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+      {...rest}
     >
       {children}
     </Motion.div>

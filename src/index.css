@@ -108,6 +108,10 @@ html {
      samples, silently killing the navbar glass blur. Horizontal overflow is
      instead prevented at the source (contained rails layout + .scroll-x). */
   max-width: 100%;
+  /* Always reserve the scrollbar gutter so locking body scroll (modals) does
+     not shift the page/header sideways. scrollbar-gutter avoids the overflow
+     pitfall noted above. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -505,6 +509,124 @@ iframe {
 
 :root[data-theme='light'] .mobile-menu-layer {
   background: rgba(8, 9, 10, 0.18);
+}
+
+/* "Still cooking" popup (Afterlife / Lab work-in-progress cards) */
+.coming-soon-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.55);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+:root[data-theme='light'] .coming-soon-layer {
+  background: rgba(8, 9, 10, 0.32);
+}
+
+/* Blueprint rails on the blurred overlay - same width/position as .page-shell */
+.coming-soon-layer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1240px, calc(100% - 40px));
+  border-inline: 1px solid var(--line-soft);
+  pointer-events: none;
+}
+
+.coming-soon-modal {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: min(560px, calc(100% - 32px));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(150deg, var(--card-grad-a), var(--card-grad-b) 72%);
+  padding: 26px 30px 26px 26px;
+  text-align: left;
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  box-shadow:
+    0 24px 60px -24px rgba(0, 0, 0, 0.6),
+    0 0 40px 8px rgba(255, 106, 0, 0.18);
+}
+
+
+.coming-soon-video {
+  display: block;
+  flex-shrink: 0;
+  width: 180px;
+  max-width: 45%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.coming-soon-text {
+  min-width: 0;
+}
+
+.coming-soon-title {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 1.28rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.coming-soon-sub {
+  margin: 12px 0 0;
+  color: var(--text-body);
+  line-height: 1.6;
+}
+
+@media (max-width: 520px) {
+  .coming-soon-modal {
+    flex-direction: column;
+    gap: 16px;
+    padding: 30px 22px 24px;
+    text-align: center;
+  }
+
+  .coming-soon-video {
+    width: 160px;
+    max-width: 70%;
+  }
+}
+
+.coming-soon-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.coming-soon-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-strong);
+}
+
+:root[data-theme='light'] .coming-soon-close:hover {
+  background: rgba(8, 9, 10, 0.06);
 }
 
 .mobile-menu {
@@ -1401,6 +1523,15 @@ iframe {
 .content-card > * {
   position: relative;
   z-index: 1;
+}
+
+.content-card--clickable {
+  cursor: pointer;
+}
+
+.content-card--clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .content-card h3 {
@@ -3479,6 +3610,7 @@ iframe {
   .site-header-scrolled,
   .mobile-menu,
   .mobile-menu-layer,
+  .coming-soon-layer,
   .creator-dropdown,
   .back-to-top {
     -webkit-backdrop-filter: none;
