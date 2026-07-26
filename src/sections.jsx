@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion as Motion, useReducedMotion } from 'framer-motion';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
+  FaArrowLeft,
   FaArrowRight,
   FaArrowUp,
   FaAws,
@@ -770,49 +771,133 @@ function Hero() {
   );
 }
 
+// Keep in sync with the `gap` on `.about-rail` in index.css - the arrow buttons
+// advance the rail by exactly one card plus one gap.
+const ABOUT_CARD_GAP = 20;
+
 function About() {
+  // `image` is served from `public/about/`. Cards render fine without one, so a
+  // photo can be dropped in later without touching this file beyond the path.
   const highlights = [
     {
       title: 'AI / ML Engineer',
-      meta: 'Current focus',
       description: 'Building intelligent software and AI-powered products.',
+      image: '/about/ai-ml-eng.jpg',
     },
     {
       title: 'Entrepreneur',
-      meta: 'Mindset',
-      description: 'Thinking beyond code - building things with real-world impact and business sense.',
+      description: 'Thinking beyond code, with real-world impact.',
+      image: '/about/entrepreneur.jpg',
     },
     {
       title: 'Content Creator',
-      meta: 'Personal brand',
-      description: 'Creating short-form content while keeping the brand clean and professional.',
+      description: 'Short-form content, kept clean and professional.',
+      image: '/about/content-creator.jpg',
     },
     {
       title: 'INTJ Mindset',
-      meta: 'Personality',
-      description: 'A practical, planning-focused mindset for solving problems and building useful software.',
+      description: 'A practical, planning-focused way of solving things.',
+      image: '/about/intj-mindset.jpg',
+    },
+    {
+      title: 'Emograph Capturer',
+      description: 'Capturing the emotions of people and places through photography.',
+      image: '/about/emograph-capturer.jpg',
+    },
+    {
+      title: 'Blood Donor',
+      description: 'A regular blood donor — showing up for people in need',
+      image: '/about/blood-donor.jpg',
     },
   ];
 
-  return (
-    <section id="about" className="section">
-      <div className="page-shell">
-        <SectionHeader eyebrow="About" title="Calm, practical software thinking">
-          I&apos;m an AI/ML Engineer and entrepreneur from Sri Lanka, interested in building intelligent software,
-          web and mobile applications, and real-world AI solutions.
-          <br />
-          Online, I also use the handles mrnilupul2k and NilupulNishan across my creator and developer profiles.
-        </SectionHeader>
+  const reduceMotion = useReducedMotion();
+  const railRef = useRef(null);
+  const [atStart, setAtStart] = useState(true);
+  const [atEnd, setAtEnd] = useState(false);
 
-        <StaggerContainer className="about-card">
+  // 1px of slack absorbs the sub-pixel scrollLeft values browsers report at the
+  // extremes, which would otherwise leave a button stuck enabled at the end.
+  const syncEdges = useCallback(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    setAtStart(rail.scrollLeft <= 1);
+    setAtEnd(rail.scrollLeft >= rail.scrollWidth - rail.clientWidth - 1);
+  }, []);
+
+  useEffect(() => {
+    syncEdges();
+    window.addEventListener('resize', syncEdges);
+    return () => window.removeEventListener('resize', syncEdges);
+  }, [syncEdges]);
+
+  const scrollByCard = (direction) => {
+    const rail = railRef.current;
+    if (!rail) return;
+    const card = rail.querySelector('.about-highlight-card');
+    const step = card ? card.offsetWidth + ABOUT_CARD_GAP : rail.clientWidth * 0.8;
+    rail.scrollBy({ left: step * direction, behavior: reduceMotion ? 'auto' : 'smooth' });
+  };
+
+  return (
+    <section id="about" className="section about-section">
+      <div className="page-shell">
+        <div className="about-head">
+          <SectionHeader eyebrow="About" title="Calm, practical software thinking">
+            I&apos;m an AI/ML Engineer and entrepreneur from Sri Lanka, interested in building intelligent software,
+            web and mobile applications, and real-world AI solutions.
+            <br />
+            Online, I also use the handles mrnilupul2k and NilupulNishan across my creator and developer profiles.
+          </SectionHeader>
+
+          <div className="about-rail-nav">
+            <button
+              type="button"
+              className="about-rail-button"
+              onClick={() => scrollByCard(-1)}
+              disabled={atStart}
+              aria-label="Show previous highlights"
+            >
+              <FaArrowLeft aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className="about-rail-button"
+              onClick={() => scrollByCard(1)}
+              disabled={atEnd}
+              aria-label="Show next highlights"
+            >
+              <FaArrowRight aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Outside `.page-shell` on purpose: as a direct child of `.section` the
+          rail spans the full page width, so cards run off the screen edges
+          rather than stopping at the shell frame. */}
+      <div className="about-bleed">
+        <div className="about-rail" ref={railRef} onScroll={syncEdges}>
           {highlights.map((highlight) => (
-            <MotionCard key={highlight.title} className="about-highlight-card">
-              <small>{highlight.meta}</small>
-              <strong>{highlight.title}</strong>
-              <p>{highlight.description}</p>
-            </MotionCard>
+            <div className="about-highlight-card" key={highlight.title}>
+              {highlight.image ? (
+                <img
+                  className="about-card-media"
+                  src={highlight.image}
+                  alt=""
+                  width="640"
+                  height="960"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : null}
+              <div className="about-card-body">
+                <strong>{highlight.title}</strong>
+                <p>{highlight.description}</p>
+              </div>
+            </div>
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );
