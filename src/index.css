@@ -1003,6 +1003,7 @@ iframe {
 .content-card,
 .embed-card,
 .contact-form,
+.contact-cta,
 .contact-card {
   border: 1px solid var(--line-soft);
   background: var(--bg-card);
@@ -1410,7 +1411,7 @@ iframe {
 }
 
 /* ============================================================
-   Brand cards on the /channels page
+   Brand cards on the /projects page
    ============================================================ */
 .brand-card {
   display: flex;
@@ -1644,6 +1645,11 @@ iframe {
 }
 
 .project-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.explore-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
 }
@@ -2959,8 +2965,97 @@ iframe {
 }
 
 /* ============================================================
+   Explore more - route-page discovery row at the end of Home
+   ============================================================ */
+.explore-card {
+  padding: 0;
+}
+
+.explore-link {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 26px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.explore-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+.explore-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.explore-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.explore-cue svg {
+  transition: transform 200ms ease;
+}
+
+.explore-card:hover .explore-cue svg {
+  transform: translateX(4px);
+}
+
+/* ============================================================
    Contact
    ============================================================ */
+.contact-cta-section > .page-shell {
+  padding-bottom: clamp(44px, 6vh, 72px);
+}
+
+.contact-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 22px;
+  align-items: center;
+  border-radius: var(--radius);
+  padding: clamp(22px, 4vw, 34px);
+  transition: border-color 220ms ease;
+}
+
+.contact-cta:hover {
+  border-color: var(--line-strong);
+}
+
+.contact-cta h2 {
+  margin: 10px 0 12px;
+  color: var(--text-strong);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.contact-cta-copy p:last-child {
+  max-width: 560px;
+  margin: 0;
+  color: var(--text-body);
+  line-height: 1.65;
+}
+
 .contact-section > .page-shell {
   padding-bottom: clamp(44px, 6vh, 72px);
 }
@@ -3319,6 +3414,7 @@ iframe {
 
   .tech-grid,
   .project-grid,
+  .explore-grid,
   .certificate-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3479,11 +3575,17 @@ iframe {
 
   .tech-grid,
   .project-grid,
+  .explore-grid,
   .certificate-grid,
   .stats-grid,
   .contact-form,
   .social-row {
     grid-template-columns: 1fr;
+  }
+
+  .contact-cta {
+    grid-template-columns: 1fr;
+    text-align: left;
   }
 
   .footer-grid {
