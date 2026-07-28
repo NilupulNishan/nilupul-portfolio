@@ -39,14 +39,14 @@ const platformLabel = {
   portfolio: 'Portfolio',
 };
 
-export default function Channels() {
-  useDocumentTitle('Channels - Nilupul Nishan');
+export default function Projects() {
+  useDocumentTitle('Projects - Nilupul Nishan');
 
   return (
     <>
-      <section id="channels" className="section">
+      <section id="projects" className="section">
         <div className="page-shell">
-          <SectionHeader eyebrow="Channels" title="My brands & content">
+          <SectionHeader eyebrow="Projects" title="Brands & content I've built">
             The brands and content series I create under - each with its own home across platforms.
           </SectionHeader>
 

@@ -7,6 +7,8 @@ import {
   FaArrowUp,
   FaAws,
   FaBrain,
+  FaChartBar,
+  FaChartLine,
   FaCode,
   FaCodeBranch,
   FaCubes,
@@ -15,13 +17,13 @@ import {
   FaFacebookSquare,
   FaGithub,
   FaGraduationCap,
-  FaImage,
   FaInstagram,
+  FaLayerGroup,
   FaLinkedin,
   FaMapMarkerAlt,
   FaMicrosoft,
   FaMoon,
-  FaPlug,
+  FaPalette,
   FaRobot,
   FaStar,
   FaSun,
@@ -29,35 +31,40 @@ import {
   FaWhatsapp,
 } from 'react-icons/fa';
 import {
+  SiAndroidstudio,
+  SiArduino,
   SiClaude,
+  SiCloudera,
   SiCoursera,
-  SiCss3,
   SiDocker,
-  SiExpress,
+  SiFastapi,
   SiFigma,
   SiFirebase,
-  SiFlutter,
   SiGit,
   SiGithub,
   SiGraphql,
-  SiHtml5,
+  SiHuggingface,
   SiJavascript,
+  SiJira,
+  SiLangchain,
   SiMongodb,
   SiMysql,
-  SiNextdotjs,
-  SiNodedotjs,
+  SiNumpy,
   SiOpenai,
   SiOpenapiinitiative,
+  SiOpencv,
+  SiPandas,
   SiPostgresql,
   SiPostman,
+  SiPytorch,
+  SiRaspberrypi,
   SiReact,
-  SiSpringboot,
   SiTailwindcss,
-  SiTypescript,
+  SiTensorflow,
   SiVercel,
 } from 'react-icons/si';
-import { DiJava, DiPython } from 'react-icons/di';
-import { VscAzure, VscVscode } from 'react-icons/vsc';
+import { DiPython } from 'react-icons/di';
+import { VscAzure } from 'react-icons/vsc';
 import heroBackdrop from './assets/profile/profile_pic3.jpg';
 import certifications from './data/certifications.json';
 import {
@@ -95,12 +102,11 @@ const sectionToNavMap = {
   education: '#about',
   experience: '#experience',
   'tech-stack': '#about',
-  projects: '#projects',
-  'featured-project': '#projects',
-  github: '#projects',
-  certificates: '#projects',
-  certifications: '#projects',
-  contact: '#contact',
+  'case-studies': '#experience',
+  'featured-project': '#experience',
+  github: '#experience',
+  certificates: '#experience',
+  certifications: '#experience',
 };
 
 const socialIconMap = {
@@ -113,45 +119,47 @@ const socialIconMap = {
 };
 
 const techIconMap = {
-  Python: DiPython,
-  'Machine Learning': FaBrain,
-  'OpenAI APIs': SiOpenai,
-  'AI Agents': FaRobot,
-  LlamaIndex: FaBrain,
-  LangChain: FaArrowRight,
+  'Agentic Workflows': FaRobot,
+  'RAG Systems': FaLayerGroup,
+  LangChain: SiLangchain,
   LangGraph: SiGraphql,
-  'Model Integration': FaCubes,
-  'Image Classification': FaImage,
+  LlamaIndex: FaBrain,
+  'Hugging Face': SiHuggingface,
+  'OpenAI APIs': SiOpenai,
+  Claude: SiClaude,
+  Python: DiPython,
+  PyTorch: SiPytorch,
+  TensorFlow: SiTensorflow,
+  OpenCV: SiOpencv,
+  Pandas: SiPandas,
+  NumPy: SiNumpy,
+  Matplotlib: FaChartLine,
+  'Power BI': FaChartBar,
   React: SiReact,
-  'Next.js': SiNextdotjs,
-  TypeScript: SiTypescript,
   JavaScript: SiJavascript,
   'Tailwind CSS': SiTailwindcss,
-  HTML5: SiHtml5,
-  CSS3: SiCss3,
-  Java: DiJava,
-  'Spring Boot basics': SiSpringboot,
-  'Node.js': SiNodedotjs,
-  'Express.js': SiExpress,
+  FastAPI: SiFastapi,
   'REST APIs': SiOpenapiinitiative,
-  'API Integration': FaPlug,
-  Flutter: SiFlutter,
+  Postman: SiPostman,
+  'UI/UX': FaPalette,
+  Figma: SiFigma,
+  PostgreSQL: SiPostgresql,
   MySQL: SiMysql,
   MongoDB: SiMongodb,
-  PostgreSQL: SiPostgresql,
   Firebase: SiFirebase,
   'Cosmos DB': VscAzure,
   ChromaDB: FaDatabase,
-  Git: SiGit,
-  GitHub: SiGithub,
+  Azure: FaMicrosoft,
+  AWS: FaAws,
+  Cloudera: SiCloudera,
   Docker: SiDocker,
   Vercel: SiVercel,
-  Azure: FaMicrosoft,
-  Figma: SiFigma,
-  Postman: SiPostman,
-  'VS Code': VscVscode,
-  Codex: FaRobot,
-  Claude: SiClaude,
+  Git: SiGit,
+  GitHub: SiGithub,
+  Jira: SiJira,
+  'Android Studio': SiAndroidstudio,
+  Arduino: SiArduino,
+  'Raspberry Pi': SiRaspberrypi,
 };
 
 const fadeUp = {
@@ -532,20 +540,6 @@ function Navbar() {
       const sectionTargets = Array.from(document.querySelectorAll('section[id]'))
         .filter((section) => sectionToNavMap[section.id]);
 
-      const documentHeight = document.documentElement.scrollHeight;
-      const bottomDistance = documentHeight - (window.scrollY + window.innerHeight);
-
-      if (bottomDistance < 24) {
-        setActiveNav('#contact');
-        return;
-      }
-
-      const contactSection = document.querySelector('#contact');
-      if (contactSection?.getBoundingClientRect().top <= window.innerHeight * 0.72) {
-        setActiveNav('#contact');
-        return;
-      }
-
       const marker = window.innerHeight * 0.45;
       const currentSectionId = sectionTargets.reduce((current, section) => {
         const rect = section.getBoundingClientRect();
@@ -629,16 +623,9 @@ function Navbar() {
           </div>
 
           <div className="nav-actions">
-            <a
-              className="button button-secondary nav-cta"
-              href="/#contact"
-              onClick={(event) => {
-                event.preventDefault();
-                goToSection('contact');
-              }}
-            >
+            <NavLink className="button button-secondary nav-cta" to="/contact" onClick={closeMobileMenu}>
               Get in touch
-            </a>
+            </NavLink>
             {LIGHT_MODE_ENABLED ? (
               <button
                 className="theme-toggle"
@@ -743,12 +730,12 @@ function Hero() {
             </Motion.p>
 
             <Motion.div className="hero-actions" variants={leanMotion ? mobileFadeUp : fadeUp}>
-              <a className="button button-primary" href="#projects">
-                View Projects <FaArrowRight aria-hidden="true" />
+              <a className="button button-primary" href="#case-studies">
+                View My Work <FaArrowRight aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#contact">
+              <NavLink className="button button-secondary" to="/contact">
                 Contact Me
-              </a>
+              </NavLink>
             </Motion.div>
           </Motion.div>
         </div>
@@ -843,9 +830,9 @@ function About() {
     <section id="about" className="section about-section">
       <div className="page-shell">
         <div className="about-head">
-          <SectionHeader eyebrow="About" title="Calm, practical software thinking">
-            I&apos;m an AI/ML Engineer and entrepreneur from Sri Lanka, interested in building intelligent software,
-            web and mobile applications, and real-world AI solutions.
+          <SectionHeader eyebrow="About" title="Calm engineering in a hyped field">
+            I build retrieval-augmented AI that turns messy data into plain answers - and explain how it
+            works, in English and Sinhala, for people who assume it isn&apos;t for them.
             <br />
             Online, I also use the handles mrnilupul2k and NilupulNishan across my creator and developer profiles.
           </SectionHeader>
@@ -1078,7 +1065,7 @@ function TechStack() {
   );
 }
 
-function Projects() {
+function CaseStudies() {
   const width = useViewportWidth();
   const isMobile = width < 720;
   const [page, setPage] = useState(0);
@@ -1102,10 +1089,10 @@ function Projects() {
   };
 
   return (
-    <section id="projects" className="section">
+    <section id="case-studies" className="section">
       <div className="page-shell">
-        <SectionHeader eyebrow="Projects" title="Projects">
-          A broader look at apps, coursework, and software systems I have built while learning and shipping.
+        <SectionHeader eyebrow="Case Studies" title="Selected case studies">
+          A closer look at the apps, coursework, and software systems I have built while learning and shipping.
         </SectionHeader>
 
         <AnimatePresence mode="wait">
@@ -1144,7 +1131,7 @@ function Projects() {
         </AnimatePresence>
 
         <SectionPagination
-          label="Projects"
+          label="Case studies"
           currentPage={page}
           totalPages={totalPages}
           onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
@@ -1156,7 +1143,7 @@ function Projects() {
           initialVisibleCount={projectMobileBatchSize}
           onShowMore={showMoreProjects}
           onShowLess={showLessProjects}
-          showMoreLabel="Show More Projects"
+          showMoreLabel="Show More Case Studies"
           showLessLabel="Show Less"
         />
       </div>
@@ -1829,6 +1816,82 @@ function Promotions() {
   );
 }
 
+// The three route pages are invisible to anyone who never looks at the navbar -
+// they are not part of the Home scroll at all. This row surfaces them inline.
+const exploreDestinations = [
+  {
+    to: '/projects',
+    label: 'Projects',
+    blurb: 'The brands and content series I build and run across platforms.',
+    Icon: FaCubes,
+  },
+  {
+    to: '/afterlife',
+    label: 'Afterlife',
+    blurb: 'Philanthropy and the legacy work I want to outlast me.',
+    Icon: FaStar,
+  },
+  {
+    to: '/lab',
+    label: 'Lab',
+    blurb: 'Experiments, half-built ideas, and things I am still cooking.',
+    Icon: FaCode,
+  },
+];
+
+function ExploreMore() {
+  return (
+    <section id="explore" className="section explore-section">
+      <div className="page-shell">
+        <SectionHeader eyebrow="Explore" title="More of what I'm building">
+          Beyond this page - the brands, the giving, and the experiments.
+        </SectionHeader>
+
+        <StaggerContainer className="card-grid explore-grid">
+          {exploreDestinations.map((destination) => {
+            const Icon = destination.Icon;
+            return (
+              <MotionCard key={destination.to} className="content-card explore-card">
+                <NavLink to={destination.to} className="explore-link">
+                  <span className="explore-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <h3>{destination.label}</h3>
+                  <p>{destination.blurb}</p>
+                  <span className="explore-cue">
+                    Visit {destination.label} <FaArrowRight aria-hidden="true" />
+                  </span>
+                </NavLink>
+              </MotionCard>
+            );
+          })}
+        </StaggerContainer>
+      </div>
+    </section>
+  );
+}
+
+// Slim band closing the Home scroll. The full contact card lives on /contact -
+// this keeps the "I just read everything, now what" moment from dead-ending.
+function ContactCta() {
+  return (
+    <section className="section contact-cta-section">
+      <div className="page-shell">
+        <Reveal className="contact-cta">
+          <div className="contact-cta-copy">
+            <p className="eyebrow">Contact</p>
+            <h2>Let&apos;s build something thoughtful.</h2>
+            <p>Open to AI opportunities, software projects, collaborations, and promotions.</p>
+          </div>
+          <NavLink className="button button-primary" to="/contact">
+            Get in touch <FaArrowRight aria-hidden="true" />
+          </NavLink>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 function Contact() {
   const visibleLinks = socialLinks.filter((link) =>
     ['github', 'linkedin', 'tiktok', 'instagram', 'facebook'].includes(link.type),
@@ -1958,11 +2021,13 @@ export {
   Education,
   TechStack,
   Experience,
-  Projects,
+  CaseStudies,
   GitHubActivity,
   Certifications,
   TikTokSection,
   Promotions,
+  ExploreMore,
+  ContactCta,
   Contact,
 };
 

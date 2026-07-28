@@ -2,11 +2,10 @@ export const navItems = [
   { label: 'Home', to: '/', type: 'anchor', section: 'home' },
   { label: 'About', to: '/#about', type: 'anchor', section: 'about' },
   { label: 'Experience', to: '/#experience', type: 'anchor', section: 'experience' },
-  { label: 'Projects', to: '/#projects', type: 'anchor', section: 'projects' },
-  { label: 'Channels', to: '/channels', type: 'route' },
+  { label: 'Projects', to: '/projects', type: 'route' },
   { label: 'Afterlife', to: '/afterlife', type: 'route' },
   { label: 'Lab', to: '/lab', type: 'route' },
-  { label: 'Contact', to: '/#contact', type: 'anchor', section: 'contact' },
+  { label: 'Contact', to: '/contact', type: 'route' },
 ];
 
 export const socialLinks = [
@@ -19,92 +18,98 @@ export const socialLinks = [
   { label: 'Email', href: 'mailto:nilupulofficial2000@gmail.com', type: 'email' },
 ];
 
+// Six cards, ordered strongest-first, each sized to fill its grid cell. Every
+// chip maps to something on the CV - see techIconMap in sections.jsx for icons.
 export const techCategories = [
   {
-    title: 'AI / LLM Tools',
+    title: 'AI & Agents',
     items: [
-      'Python',
-      'Machine Learning',
-      'OpenAI APIs',
-      'AI Agents',
-      'LlamaIndex',
+      'Agentic Workflows',
+      'RAG Systems',
       'LangChain',
       'LangGraph',
-      'Model Integration',
-      'Image Classification',
+      'LlamaIndex',
+      'Hugging Face',
+      'OpenAI APIs',
+      'Claude',
     ],
   },
   {
-    title: 'Frontend',
+    title: 'ML & Data Science',
+    items: [
+      'Python',
+      'PyTorch',
+      'TensorFlow',
+      'OpenCV',
+      'Pandas',
+      'NumPy',
+      'Matplotlib',
+      'Power BI',
+    ],
+  },
+  {
+    title: 'Web & APIs',
     items: [
       'React',
-      'Next.js',
-      'TypeScript',
       'JavaScript',
       'Tailwind CSS',
-      'HTML5',
-      'CSS3',
-    ],
-  },
-  {
-    title: 'Backend & APIs',
-    items: [
-      'Java',
-      'Spring Boot basics',
-      'Node.js',
-      'Express.js',
+      'FastAPI',
       'REST APIs',
-      'API Integration',
+      'Postman',
+      'UI/UX',
+      'Figma',
     ],
   },
   {
-    title: 'Mobile',
+    title: 'Databases',
     items: [
-      'Flutter',
-    ],
-  },
-  {
-    title: 'Database',
-    items: [
-      'MySQL',
       'PostgreSQL',
+      'MySQL',
+      'MongoDB',
       'Firebase',
       'Cosmos DB',
       'ChromaDB',
     ],
   },
   {
-    title: 'DevOps & Tools',
+    title: 'Cloud & DevOps',
     items: [
-      'Git',
-      'GitHub',
+      'Azure',
+      'AWS',
+      'Cloudera',
       'Docker',
       'Vercel',
-      'Azure',
-      'Figma',
-      'Postman',
-      'VS Code',
-      'Claude',
+      'Git',
+      'GitHub',
+      'Jira',
+    ],
+  },
+  {
+    title: 'Mobile & Embedded',
+    items: [
+      'Android Studio',
+      'Arduino',
+      'Raspberry Pi',
     ],
   },
 ];
 
 export const logoLoopItems = [
-  'React',
-  'Next.js',
-  'TypeScript',
-  'Tailwind CSS',
-  'Java',
   'Python',
-  'Flutter',
-  'Firebase',
+  'LangChain',
+  'PyTorch',
+  'Hugging Face',
+  'React',
+  'Tailwind CSS',
+  'FastAPI',
   'PostgreSQL',
-  'Figma',
+  'Firebase',
+  'Docker',
+  'Azure',
   'GitHub',
-  'Postman',
 ];
 
-// Brands / content series shown on the /channels page. Each brand carries its own
+// Brands / content series shown on the /projects page. Each brand carries its own
 // platform links. Leave a link `href` empty ('') and it renders as "coming soon".
 export const brands = [
   {

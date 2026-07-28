@@ -4,10 +4,11 @@ import {
   Education,
   TechStack,
   Experience,
-  Projects,
+  CaseStudies,
   GitHubActivity,
   Certifications,
-  Contact,
+  ExploreMore,
+  ContactCta,
 } from '../sections';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
@@ -21,10 +22,11 @@ export default function Home() {
       <Education />
       <TechStack />
       <Experience />
-      <Projects />
+      <CaseStudies />
       <GitHubActivity />
       <Certifications />
-      <Contact />
+      <ExploreMore />
+      <ContactCta />
     </>
   );
 }
