@@ -623,9 +623,20 @@ function Navbar() {
           </div>
 
           <div className="nav-actions">
-            <NavLink className="button button-secondary nav-cta" to="/contact" onClick={closeMobileMenu}>
-              Get in touch
-            </NavLink>
+            {/* Contact lives in navItems as a text link, so this slot points at the
+                testimonials section instead of duplicating the same /contact URL.
+                Testimonials is a Home section, not a route, so it goes through
+                goToSection like the anchor nav items rather than a NavLink. */}
+            <a
+              className="button button-secondary nav-cta"
+              href="/#testimonials"
+              onClick={(event) => {
+                event.preventDefault();
+                goToSection('testimonials');
+              }}
+            >
+              What they said
+            </a>
             {LIGHT_MODE_ENABLED ? (
               <button
                 className="theme-toggle"
@@ -1816,6 +1827,316 @@ function Promotions() {
   );
 }
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+const GOOGLE_SCRIPT_ID = 'google-identity-script';
+const TESTIMONIAL_MIN_LENGTH = 10;
+const TESTIMONIAL_MAX_LENGTH = 1000;
+const TESTIMONIAL_ROLE_MAX_LENGTH = 120;
+
+// Display only - the same token is re-verified server-side before anything is
+// stored, so nothing here is trusted for identity.
+function decodeGoogleCredential(credential) {
+  try {
+    const segment = String(credential).split('.')[1];
+    const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+    const bytes = Uint8Array.from(window.atob(base64), (character) => character.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    return null;
+  }
+}
+
+// Google avatar URLs are not stable - they 404 once someone changes their photo -
+// so the fallback is required, not decorative.
+function TestimonialAvatar({ name, picture }) {
+  const [failed, setFailed] = useState(false);
+
+  const initials = String(name || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase() || '?';
+
+  if (!picture || failed) {
+    return (
+      <span className="testimonial-avatar testimonial-avatar-fallback" aria-hidden="true">
+        {initials}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      className="testimonial-avatar"
+      src={picture}
+      alt=""
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function Testimonials() {
+  const [feed, setFeed] = useState({ status: 'loading', items: [], error: null });
+  const [googleReady, setGoogleReady] = useState(false);
+  const [identity, setIdentity] = useState(null);
+  const [credential, setCredential] = useState('');
+  const [role, setRole] = useState('');
+  const [quote, setQuote] = useState('');
+  const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [published, setPublished] = useState(false);
+  const signInRef = useRef(null);
+
+  const loadTestimonials = useCallback(async () => {
+    try {
+      const response = await fetch('/api/testimonials');
+      const data = await response.json().catch(() => ({}));
+
+      // 503 means the datastore is not provisioned yet. There genuinely are no
+      // testimonials in that case, so show the neutral empty state rather than an
+      // error banner on a live portfolio.
+      if (response.status === 503) {
+        setFeed({ status: 'success', items: [], error: null });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Recommendations are unavailable.');
+      }
+
+      setFeed({
+        status: 'success',
+        items: Array.isArray(data.testimonials) ? data.testimonials : [],
+        error: null,
+      });
+    } catch (error) {
+      setFeed({ status: 'error', items: [], error: error.message || 'Recommendations are unavailable.' });
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTestimonials();
+  }, [loadTestimonials]);
+
+  // Same script-injection idiom as the TikTok embed loader above.
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) {
+      return undefined;
+    }
+
+    const markReady = () => setGoogleReady(true);
+    const existingScript = document.getElementById(GOOGLE_SCRIPT_ID);
+
+    if (existingScript) {
+      if (window.google?.accounts?.id) {
+        markReady();
+      } else {
+        existingScript.addEventListener('load', markReady, { once: true });
+      }
+      return () => existingScript.removeEventListener('load', markReady);
+    }
+
+    const script = document.createElement('script');
+    script.id = GOOGLE_SCRIPT_ID;
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.onload = markReady;
+    document.body.appendChild(script);
+
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !googleReady || identity || !signInRef.current) {
+      return;
+    }
+
+    const googleId = window.google?.accounts?.id;
+    if (!googleId) {
+      return;
+    }
+
+    googleId.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: (response) => {
+        const profile = decodeGoogleCredential(response?.credential);
+        if (!profile) {
+          setFormError('Google sign-in failed. Please try again.');
+          return;
+        }
+        setCredential(response.credential);
+        setIdentity({ name: profile.name || profile.email || 'You', picture: profile.picture || '' });
+        setFormError('');
+      },
+    });
+
+    googleId.renderButton(signInRef.current, {
+      theme: 'outline',
+      size: 'large',
+      text: 'signin_with',
+      shape: 'rectangular',
+    });
+  }, [googleReady, identity]);
+
+  function handleSignOut() {
+    window.google?.accounts?.id?.disableAutoSelect?.();
+    setIdentity(null);
+    setCredential('');
+    setPublished(false);
+    setFormError('');
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const trimmedQuote = quote.trim();
+
+    if (trimmedQuote.length < TESTIMONIAL_MIN_LENGTH) {
+      setFormError(`Please write at least ${TESTIMONIAL_MIN_LENGTH} characters.`);
+      return;
+    }
+
+    if (trimmedQuote.length > TESTIMONIAL_MAX_LENGTH) {
+      setFormError(`Please keep it under ${TESTIMONIAL_MAX_LENGTH} characters.`);
+      return;
+    }
+
+    setSubmitting(true);
+    setFormError('');
+
+    try {
+      const response = await fetch('/api/testimonials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential, quote: trimmedQuote, role: role.trim() }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not publish your recommendation.');
+      }
+
+      setQuote('');
+      setRole('');
+      setPublished(true);
+      await loadTestimonials();
+    } catch (error) {
+      setFormError(error.message || 'Could not publish your recommendation.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const emptyMessage =
+    feed.status === 'loading'
+      ? 'Loading recommendations...'
+      : feed.status === 'error'
+        ? 'Recommendations are unavailable right now.'
+        : 'No recommendations yet - be the first to leave one.';
+
+  return (
+    <section id="testimonials" className="section">
+      <div className="page-shell">
+        <SectionHeader eyebrow="Testimonials" title="What they said">
+          Recommendations from people I have worked, studied, and built things with.
+        </SectionHeader>
+
+        {feed.items.length > 0 ? (
+          <StaggerContainer className="card-grid testimonial-grid">
+            {feed.items.map((item) => (
+              <MotionCard key={item.id} className="content-card testimonial-card">
+                <blockquote>{item.quote}</blockquote>
+                <div className="testimonial-attribution">
+                  <TestimonialAvatar name={item.name} picture={item.picture} />
+                  <div>
+                    <p className="testimonial-name">{item.name}</p>
+                    {item.role ? <p className="testimonial-role">{item.role}</p> : null}
+                  </div>
+                </div>
+              </MotionCard>
+            ))}
+          </StaggerContainer>
+        ) : (
+          <Reveal className="testimonial-empty">
+            <p>{emptyMessage}</p>
+          </Reveal>
+        )}
+
+        {/* Without a client ID the sign-in button would render broken, so the whole
+            submission block is hidden and the list above still stands on its own. */}
+        {GOOGLE_CLIENT_ID ? (
+          <Reveal className="testimonial-form-wrap">
+            {identity ? (
+              <form className="contact-form testimonial-form" onSubmit={handleSubmit} noValidate>
+                <div className="testimonial-signed-in full">
+                  <TestimonialAvatar name={identity.name} picture={identity.picture} />
+                  <p>
+                    Posting as <strong>{identity.name}</strong>
+                  </p>
+                  <button className="testimonial-signout" type="button" onClick={handleSignOut}>
+                    Not you?
+                  </button>
+                </div>
+
+                <label className="full">
+                  Role or company <span className="testimonial-optional">(optional)</span>
+                  <input
+                    type="text"
+                    name="role"
+                    value={role}
+                    maxLength={TESTIMONIAL_ROLE_MAX_LENGTH}
+                    placeholder="Software Engineer at Acme"
+                    onChange={(event) => setRole(event.target.value)}
+                    disabled={submitting}
+                  />
+                </label>
+
+                <label className="full">
+                  Your recommendation
+                  <textarea
+                    className={formError ? 'field-error' : ''}
+                    name="quote"
+                    rows="5"
+                    value={quote}
+                    maxLength={TESTIMONIAL_MAX_LENGTH}
+                    placeholder="What was it like working with me?"
+                    aria-invalid={Boolean(formError)}
+                    aria-describedby={formError ? 'testimonial-quote-error' : undefined}
+                    onChange={(event) => setQuote(event.target.value)}
+                    disabled={submitting}
+                  />
+                  {formError ? <FormError id="testimonial-quote-error">{formError}</FormError> : null}
+                </label>
+
+                <p>Your Google name and profile photo are shown with it. Your email address is never published. It goes live right away.</p>
+
+                {published ? <p className="testimonial-published">Published - thank you.</p> : null}
+
+                <button className="button button-primary full" type="submit" disabled={submitting}>
+                  {submitting ? 'Publishing...' : 'Publish recommendation'}
+                </button>
+              </form>
+            ) : (
+              <div className="testimonial-signin">
+                <div>
+                  <h3>Worked with me?</h3>
+                  <p>Sign in with Google to leave a recommendation. It publishes immediately under your Google name.</p>
+                  {formError ? <FormError id="testimonial-signin-error">{formError}</FormError> : null}
+                </div>
+                <div className="testimonial-signin-button" ref={signInRef} />
+              </div>
+            )}
+          </Reveal>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 // The three route pages are invisible to anyone who never looks at the navbar -
 // they are not part of the Home scroll at all. This row surfaces them inline.
 const exploreDestinations = [
@@ -2026,6 +2347,7 @@ export {
   Certifications,
   TikTokSection,
   Promotions,
+  Testimonials,
   ExploreMore,
   ContactCta,
   Contact,

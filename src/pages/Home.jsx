@@ -7,6 +7,7 @@ import {
   CaseStudies,
   GitHubActivity,
   Certifications,
+  Testimonials,
   ExploreMore,
   ContactCta,
 } from '../sections';
@@ -25,6 +26,7 @@ export default function Home() {
       <CaseStudies />
       <GitHubActivity />
       <Certifications />
+      <Testimonials />
       <ExploreMore />
       <ContactCta />
     </>

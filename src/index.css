@@ -3020,6 +3020,176 @@ iframe {
 }
 
 /* ============================================================
+   Testimonials - Google-authenticated recommendations
+   ============================================================ */
+.testimonial-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 26px;
+}
+
+.testimonial-card blockquote {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.testimonial-card blockquote::before {
+  content: '\201C';
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent);
+  font-size: 2rem;
+  line-height: 0.6;
+}
+
+.testimonial-attribution {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.testimonial-avatar {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--line-soft);
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  object-fit: cover;
+}
+
+.testimonial-avatar-fallback {
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.testimonial-name {
+  margin: 0;
+  color: var(--text-strong);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.testimonial-role {
+  margin: 2px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.testimonial-empty {
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: clamp(24px, 4vw, 36px);
+  text-align: center;
+}
+
+.testimonial-empty p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.testimonial-form-wrap {
+  max-width: 720px;
+  margin: 28px auto 0;
+}
+
+.testimonial-signin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.testimonial-signin h3 {
+  margin: 0 0 6px;
+  color: var(--text-strong);
+  font-size: 1.05rem;
+}
+
+.testimonial-signin p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+/* Google renders its own iframe button here - only reserve the space. */
+.testimonial-signin-button {
+  min-height: 44px;
+}
+
+.testimonial-form {
+  grid-template-columns: 1fr;
+  border: 1px solid var(--line);
+  padding: clamp(20px, 3vw, 28px);
+}
+
+.testimonial-signed-in {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.testimonial-signed-in p {
+  margin: 0;
+  color: var(--text-meta);
+  font-size: 0.9rem;
+}
+
+.testimonial-signed-in strong {
+  color: var(--text-strong);
+}
+
+.testimonial-signout {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.testimonial-signout:hover {
+  text-decoration: underline;
+}
+
+.testimonial-optional {
+  color: var(--text-muted);
+}
+
+/* Outranks the generic `.contact-form p` colour without reaching for !important. */
+.testimonial-form p.testimonial-published {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ============================================================
    Contact
    ============================================================ */
 .contact-cta-section > .page-shell {
@@ -3415,6 +3585,7 @@ iframe {
   .tech-grid,
   .project-grid,
   .explore-grid,
+  .testimonial-grid,
   .certificate-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3576,10 +3747,15 @@ iframe {
   .tech-grid,
   .project-grid,
   .explore-grid,
+  .testimonial-grid,
   .certificate-grid,
   .stats-grid,
   .contact-form,
   .social-row {
+    grid-template-columns: 1fr;
+  }
+
+  .testimonial-signin {
     grid-template-columns: 1fr;
   }
 
