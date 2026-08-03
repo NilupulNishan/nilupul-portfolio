@@ -15,26 +15,44 @@ npm run lint      # Run ESLint
 
 Copy `.env.example` to `.env` and fill in the values before running locally:
 
-- `GITHUB_TOKEN` — GitHub personal access token with `read:user` scope (for the contribution calendar)
-- `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` — Spotify app credentials (for playlist follower count)
+- `GITHUB_TOKEN`  - GitHub personal access token with `read:user` scope (for the contribution calendar)
+- `VITE_GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_ID`  - the same Google OAuth Web client ID under two names; only `VITE_`-prefixed vars reach the browser, and the server needs the bare name for the `aud` check
+- `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`  - Upstash Redis REST credentials (`KV_REST_API_URL` / `KV_REST_API_TOKEN` also work, for stores provisioned through the Vercel Marketplace)
+- `RESEND_API_KEY` / `TESTIMONIAL_NOTIFY_EMAIL`  - new-testimonial notification email; `TESTIMONIAL_FROM_EMAIL` is optional
+- `TESTIMONIAL_DELETE_SECRET`  - long random string; signs the one-click delete link
+- `SITE_URL`  - optional; origin used to build the delete link when request headers are not enough
 
-Both APIs degrade gracefully when credentials are missing — the UI shows fallback states rather than breaking.
+Every credential degrades gracefully when missing  - the UI shows a fallback state rather than breaking. Never prefix the Upstash token, Resend key or delete secret with `VITE_`; that would bundle them into the public JS.
 
 ## Architecture
 
-This is a single-page React portfolio deployed to Vercel. The app is one large `App.jsx` that renders all page sections sequentially; there is no router.
+This is a multi-page React portfolio deployed to Vercel, using **react-router-dom** (data router via `createBrowserRouter`).
 
-**Data layer** — Static content lives in `src/data/`:
-- `portfolio.js` — nav items, social links, tech categories, projects list, TikTok stats. This is the main file to edit when updating portfolio content.
-- `certifications.json` — certification cards array
+**Routing**  - `src/router.jsx` defines the routes; `src/main.jsx` renders `<RouterProvider>`. A shared `src/layout/Layout.jsx` (header/nav, footer, scroll progress, back-to-top, `<ScrollRestoration/>`, Analytics) wraps every page via `<Outlet/>`. Pages live in `src/pages/`: `Home` (the long scroll), `Projects` (brands/content series - formerly `Channels`, with a `/channels` -> `/projects` redirect in `vercel.json`), `Afterlife` (philanthropy/legacy), `Lab` (experimental), `Contact`, `NotFound`. Section components and shared motion primitives live in `src/sections.jsx`. `vercel.json` rewrites all non-`/api/*` paths to `/index.html` for SPA deep links.
+
+**Nav**  - `navItems` (`src/data/portfolio.js`) tags each link `type: 'route'` (react-router `NavLink`) or `type: 'anchor'` (a `/#section` link on Home). The `Navbar` (in `sections.jsx`) intercepts anchor clicks: scrolls on Home, or navigates to `/` with `state.scrollTo` from another page (handled by an effect in `Home.jsx`). The on-scroll active-section tracker runs only on Home.
+
+Nav is deliberately split: the first three items (`Home`, `About`, `Experience`) are Home anchors, and everything after them (`Projects`, `Afterlife`, `Lab`, `Contact`) is a route. Keeping all anchors ahead of all routes stops the scroll highlight from jumping over a dead gap in the middle of the bar. Because those route pages are absent from the Home scroll entirely, `ExploreMore` (a card row near the end of Home) exists purely to make them discoverable without the navbar; `ContactCta` is the slim band that closes Home and links to `/contact`.
+
+`Contact` stays in `navItems` as the single contact affordance. The `nav-actions` button beside it is **not** a second `/contact` link  - it reads `What they said` and jumps to the `#testimonials` section on Home. Because testimonials is a Home section rather than a route, that button calls `goToSection('testimonials')` like the anchor nav items instead of using a `NavLink`; from another page that navigates to `/` with `state.scrollTo`, which `Home.jsx` handles.
+
+**Data layer**  - Static content lives in `src/data/`:
+- `portfolio.js`  - nav items, social links, tech categories, projects, `afterlifeItems`, `labItems`. Main file to edit when updating content.
+- `certifications.json`  - certification cards array
 - `projects.json` and `skills.json` exist but are not currently imported (content is in `portfolio.js`)
 
-**API routes** — `api/github-contributions.js` and `api/spotify-playlist.js` are Vercel serverless functions. Vite's `localApiRoutes` plugin in `vite.config.js` serves them at `/api/*` during local development, mirroring the Vercel deployment. Both implement in-process caching with a 3-hour TTL.
+**API routes**  - `api/*.js` files are Vercel serverless functions. Vite's `localApiRoutes` plugin in `vite.config.js` serves them at `/api/*` during local development, mirroring the Vercel deployment; new routes must be registered in its hardcoded `routes` map. `api/github-contributions.js` implements in-process caching with a 3-hour TTL. Real Vercel pre-parses `request.body` for POSTs and the plugin does not, so the plugin parses JSON bodies itself  - without that, a handler reading `request.body` works in production and gets `undefined` locally.
 
-**Animation system** — All motion uses Framer Motion. The `useLeanMotion()` hook detects mobile/touch devices (`max-width: 720px` or `pointer: coarse`) and switches to lighter animation variants throughout. Shared motion primitives (`Reveal`, `StaggerContainer`, `MotionCard`) are defined in `App.jsx` and used across all sections. All animations respect `useReducedMotion()`.
+**Testimonials**  - Visitors sign in with Google (`accounts.google.com/gsi/client`, loaded with the same script-injection idiom as the TikTok embed) and `POST /api/testimonials`. The server re-verifies the ID token against `https://oauth2.googleapis.com/tokeninfo` (checking `aud`, `iss`, `exp`, `email_verified`)  - a client-decoded JWT is just a string the submitter could have typed. Identity fields come from the verified token, never the request body. Entries publish **instantly** to an Upstash Redis list; `GET /api/testimonials` **strips `email` and `sub` from every entry**, which are stored only for dedupe and notification. One entry per Google account: a resubmission replaces the previous one.
 
-**Styling** — Tailwind CSS v4 (via `@tailwindcss/vite`) for utility classes, plus CSS Modules per component in the `src/components/` directory. Global tokens and base styles are in `src/index.css`; `src/vars.css` contains legacy CSS custom properties from an older theme (not actively used by the main design).
+Moderation is after the fact: each submission emails a plain-text notification containing an HMAC-signed link to `api/testimonial-delete.js`. That route's `GET` renders a confirmation page and only its `POST` deletes, because email clients and link scanners prefetch URLs. There is no admin UI by design.
 
-**Pagination** — Projects use desktop pagination (3 per page) and mobile show-more (2 per batch). Certifications use responsive page sizes (3/4/6 depending on breakpoint) and mobile show-more (3 per batch). Both are driven by `SectionPagination` in `App.jsx`.
+`api/_store.js` is the swappable storage seam  - it is the only file that knows Upstash is behind the data. `api/_signing.js` holds the HMAC sign/verify pair.
 
-**Deployment** — Vercel. `public/sitemap.xml` and `public/robots.txt` are static. Analytics via `@vercel/analytics`.
+**Animation system**  - All motion uses Framer Motion. The `useLeanMotion()` hook detects mobile/touch devices (`max-width: 720px` or `pointer: coarse`) and switches to lighter animation variants throughout. Shared motion primitives (`Reveal`, `StaggerContainer`, `MotionCard`) are defined in `src/sections.jsx` and exported for use across pages. All animations respect `useReducedMotion()`.
+
+**Styling**  - Tailwind CSS v4 (via `@tailwindcss/vite`) for utility classes. All global styles, the design tokens, and the light/dark theme live in `src/index.css`. The accent color is centralized in the `--accent` token (`:root` + `[data-theme="dark"]`); the toggle writes `document.documentElement.dataset.theme`.
+
+**Pagination**  - Case studies (the `CaseStudies` section on Home, backed by the `projects` array) use desktop pagination (3 per page) and mobile show-more (2 per batch). Certifications use responsive page sizes (3/4/6 depending on breakpoint) and mobile show-more (3 per batch). Both are driven by `SectionPagination` in `src/sections.jsx`.
+
+**Deployment**  - Vercel. `public/sitemap.xml` and `public/robots.txt` are static. Analytics via `@vercel/analytics`.
