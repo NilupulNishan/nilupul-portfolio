@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AnimatePresence,
   motion as Motion,
@@ -1890,14 +1890,22 @@ function TestimonialAvatar({ name, picture }) {
 // names, faces or text: filling the distance with lookalike testimonial cards
 // would imply recommendations that do not exist.
 const depthPanels = [
-  { left: '4%', top: '14%', width: 120, height: 74, z: -980, opacity: 0.16 },
-  { left: '20%', top: '68%', width: 86, height: 54, z: -1240, opacity: 0.12 },
-  { left: '32%', top: '8%', width: 150, height: 90, z: -760, opacity: 0.2 },
-  { left: '54%', top: '76%', width: 110, height: 68, z: -900, opacity: 0.15 },
-  { left: '72%', top: '18%', width: 96, height: 60, z: -1120, opacity: 0.13 },
-  { left: '86%', top: '58%', width: 132, height: 80, z: -820, opacity: 0.18 },
-  { left: '12%', top: '40%', width: 64, height: 40, z: -1420, opacity: 0.1 },
-  { left: '64%', top: '44%', width: 72, height: 44, z: -1320, opacity: 0.11 },
+  { left: '2%', top: '10%', width: 150, height: 92, z: -620, opacity: 0.3 },
+  { left: '15%', top: '72%', width: 122, height: 76, z: -760, opacity: 0.26 },
+  { left: '27%', top: '4%', width: 178, height: 108, z: -520, opacity: 0.34 },
+  { left: '40%', top: '86%', width: 138, height: 84, z: -680, opacity: 0.24 },
+  { left: '55%', top: '80%', width: 116, height: 72, z: -900, opacity: 0.22 },
+  { left: '70%', top: '12%', width: 160, height: 96, z: -580, opacity: 0.32 },
+  { left: '88%', top: '62%', width: 146, height: 88, z: -700, opacity: 0.28 },
+  { left: '95%', top: '22%', width: 104, height: 64, z: -1020, opacity: 0.2 },
+  { left: '8%', top: '38%', width: 88, height: 54, z: -1180, opacity: 0.17 },
+  { left: '33%', top: '52%', width: 74, height: 46, z: -1460, opacity: 0.14 },
+  { left: '48%', top: '22%', width: 66, height: 42, z: -1620, opacity: 0.12 },
+  { left: '62%', top: '58%', width: 82, height: 50, z: -1340, opacity: 0.15 },
+  { left: '78%', top: '40%', width: 70, height: 44, z: -1540, opacity: 0.13 },
+  { left: '20%', top: '26%', width: 58, height: 36, z: -1800, opacity: 0.1 },
+  { left: '85%', top: '84%', width: 62, height: 38, z: -1720, opacity: 0.11 },
+  { left: '45%', top: '68%', width: 54, height: 34, z: -1900, opacity: 0.09 },
 ];
 
 function TestimonialCardBody({ item }) {
@@ -1919,17 +1927,115 @@ function TestimonialCardBody({ item }) {
 // the way down and recedes on the way up for free, and a half-finished scroll rests
 // half-way instead of snapping. Direction-linking would need state and would jump
 // whenever you reversed mid-gesture.
-function TestimonialDepthCard({ item, index, progress }) {
-  // Each card starts further back than the last so they arrive as a cluster
-  // rather than one flat slab sliding forward.
-  const startZ = -540 - index * 110;
-  const exitZ = 70 + index * 18;
+// Dev-only harness for eyeballing the depth field without waiting for real
+// recommendations - visit /?preview=24 while running `npm run dev`.
+//
+// These are NEVER written to Redis. The datastore is shared with production, so
+// seeding it would put invented people on the live portfolio. Everything below is
+// gated on `import.meta.env.DEV`, which Vite resolves to `false` at build time, so
+// the minifier strips this array and the branch that reads it out of the production
+// bundle entirely - the same dead-code elimination that hid the sign-in block when
+// VITE_GOOGLE_CLIENT_ID was missing, used deliberately this time.
+const previewQuotes = [
+  'Shipped the whole pipeline in a week and it still has not fallen over.',
+  'Explains hard things simply. Rare.',
+  'He rewrote our retrieval layer and cut latency by more than half. Careful, well-tested work, and he documented every decision so the rest of us could follow it afterwards.',
+  'Reliable under deadline pressure.',
+  'Took an ambiguous brief and came back with something better than what we asked for.',
+  'Genuinely good to work alongside. Asks the right questions early instead of guessing.',
+  'Fixed a bug three of us had stared at for two days.',
+  'Strong instincts for what to build and, more usefully, what not to build.',
+  'Fast, but never careless. The tests were there before I asked.',
+  'He mentored two juniors on my team while delivering his own scope. Both of them are noticeably better engineers now.',
+  'Clear communicator across time zones.',
+  'The kind of person who leaves the codebase tidier than he found it.',
+];
 
-  const z = useTransform(progress, [0, 0.46, 1], [startZ, 0, exitZ]);
-  const opacity = useTransform(progress, [0, 0.2, 0.82, 1], [0, 1, 1, 0.4]);
+const previewNames = [
+  ['Amara Silva', 'Product Lead'],
+  ['Ravi Fernando', 'Backend Engineer'],
+  ['Chen Wei', 'ML Engineer'],
+  ['Dilini Perera', 'UX Designer'],
+  ['Marcus Hall', 'CTO'],
+  ['Sanduni Jayawardena', 'Data Analyst'],
+  ['Tomas Novak', 'Founder'],
+  ['Priya Nair', 'Engineering Manager'],
+  ['Kasun Bandara', 'DevOps Engineer'],
+  ['Elena Rossi', 'Design Lead'],
+  ['Ahmed Hassan', 'Solutions Architect'],
+  ['Nadia Karim', 'QA Lead'],
+];
+
+function buildPreviewItems(count) {
+  return Array.from({ length: count }, (_, index) => {
+    const [name, role] = previewNames[index % previewNames.length];
+    return {
+      id: `preview-${index}`,
+      name: index < previewNames.length ? name : `${name} ${Math.floor(index / previewNames.length) + 1}`,
+      role,
+      quote: previewQuotes[index % previewQuotes.length],
+      picture: '',
+      createdAt: new Date().toISOString(),
+    };
+  });
+}
+
+// Only used by the grid fallback (more cards than scatter slots), where cards flow
+// in columns and need a vertical nudge to avoid sitting in a dead-straight row.
+// Deterministic by index so a card never jumps between renders.
+const restOffsets = [0, 38, -24, 54, -14, 28];
+
+// Hand-placed scatter, mirroring the reference: cards at genuinely different sizes
+// spread across the field instead of sitting in a row. Size comes from a real width
+// plus a rest depth, so perspective does the scaling - and nothing is rotated, which
+// is the one thing about the reference Nilupul did not want.
+// Depth is no longer per-slot - every card now travels the same Z range on a
+// staggered schedule - so these carry placement and width only.
+// Smaller than the first pass. Bigger cards filled the field and left little void
+// between them, which flattened the sense of space; these leave air around each one.
+// Widths bottom out around 230px because below that the quote starts wrapping every
+// three or four words and stops being comfortably readable.
+const cardSlots = [
+  { left: '2%', top: '4%', width: 300 },
+  { left: '42%', top: '30%', width: 250 },
+  { left: '72%', top: '2%', width: 278 },
+  { left: '10%', top: '60%', width: 258 },
+  { left: '48%', top: '66%', width: 292 },
+  { left: '76%', top: '48%', width: 232 },
+];
+
+function TestimonialDepthCard({ item, index, progress, slot }) {
+  // Continuous travel rather than "arrive and rest". Each card rises out of the deep
+  // field, crosses the readable band, then keeps coming until it passes the viewer.
+  // Staggering the window by index means something is always emerging from behind
+  // whatever is currently on its way out.
+  // The stagger has to stay small. At 0.075 per card the first card finished its
+  // whole flight by 62% of the track while the last had barely started, so early
+  // cards had already flown past before the section was properly settled on screen.
+  // Small offsets plus a window covering most of the track means every card spends
+  // the bulk of the pin inside the readable band.
+  const phase = Math.min(0.16, index * 0.04);
+  const z = useTransform(progress, [phase, phase + 0.84], [-1400, 420]);
+
+  // Opacity keyed to the card's own depth, not to global scroll progress - that is
+  // what makes the near ones fade as they close on the viewer while the ones still
+  // deep in the field fade up. Driving it from progress made every card fade in
+  // unison regardless of where it actually was.
+  //
+  // The solid band is deliberately wide: cards hold full opacity from -1000 all the
+  // way to -40, so the fade reads as passing the viewer rather than as vanishing
+  // early for no visible reason.
+  const opacity = useTransform(z, [-1400, -1000, -40, 360], [0, 1, 1, 0]);
+
+  const style = slot
+    ? { z, opacity, left: slot.left, top: slot.top, width: slot.width }
+    : { z, opacity, marginTop: restOffsets[index % restOffsets.length] };
 
   return (
-    <Motion.div className="content-card testimonial-card" style={{ z, opacity }}>
+    <Motion.div
+      className={`content-card testimonial-card${slot ? ' testimonial-card--placed' : ''}`}
+      style={style}
+    >
       <TestimonialCardBody item={item} />
     </Motion.div>
   );
@@ -1945,7 +2051,13 @@ function Testimonials() {
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [published, setPublished] = useState(false);
-  const signInRef = useRef(null);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  // A callback ref held in state, not a plain useRef. The sign-in block moves between
+  // two slots (beside the heading when pinned, under the grid when not), and the feed
+  // arriving flips `pinned` after mount - which unmounts the div Google rendered its
+  // button into and mounts a fresh one. With a plain ref the effect below never re-ran,
+  // so the button silently vanished. State makes the remount a dependency change.
+  const [signInNode, setSignInNode] = useState(null);
   const stageRef = useRef(null);
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
@@ -1954,14 +2066,19 @@ function Testimonials() {
   // where touch devices stutter, and the effect is barely legible on a small screen.
   const depthEnabled = !leanMotion && !reduceMotion;
 
+  // Measured against the tall pin track, not the visible panel: progress 0 is the
+  // moment the panel locks to the viewport and 1 is the moment it releases, so the
+  // whole animation maps onto exactly the stretch where the page appears frozen.
   const { scrollYProgress } = useScroll({
     target: stageRef,
-    offset: ['start end', 'end start'],
+    offset: ['start start', 'end end'],
   });
+  // Stiffer and lighter than before: the smoothing was adding noticeable lag behind
+  // the wheel, which read as the whole section being sluggish.
   const depthProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 26,
-    mass: 0.4,
+    stiffness: 160,
+    damping: 28,
+    mass: 0.28,
   });
 
   // The backdrop drifts as one layer on a single MotionValue rather than a hook per
@@ -2034,7 +2151,7 @@ function Testimonials() {
   }, []);
 
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !googleReady || identity || !signInRef.current) {
+    if (!GOOGLE_CLIENT_ID || !googleReady || identity || !signInNode) {
       return;
     }
 
@@ -2057,13 +2174,45 @@ function Testimonials() {
       },
     });
 
-    googleId.renderButton(signInRef.current, {
-      theme: 'outline',
+    // Google's official dark pill. The button is an iframe and cannot be restyled,
+    // so these four options are the entire design surface - filled_black is the
+    // darkest variant Google ships, and it sits closest to the site's near-black
+    // panels. Kept as Google's real button rather than driving One Tap from a custom
+    // one, which browsers can silently suppress.
+    // Google appends its iframe rather than replacing what is already there, so a
+    // node that has been rendered into before ends up holding a stale button from
+    // the previous options. Clearing first guarantees exactly one iframe.
+    signInNode.replaceChildren();
+
+    googleId.renderButton(signInNode, {
+      // `text: 'signin'` renders just "Sign in" - the shortest of the four phrases
+      // Google permits. It cannot say "Add yours": renderButton only accepts
+      // signin_with / signup_with / continue_with / signin, and Google's branding
+      // terms require one of those beside the G even on a custom button. So the
+      // adjacent label carries the call to action and this stays the mechanism.
+      type: 'standard',
+      theme: 'filled_black',
       size: 'large',
-      text: 'signin_with',
-      shape: 'rectangular',
+      shape: 'pill',
+      text: 'signin',
     });
-  }, [googleReady, identity]);
+    // signInNode is a dependency on purpose: when the block moves between the pinned
+    // and unpinned slots the old node is destroyed, and the button has to be drawn
+    // into the new one.
+  }, [googleReady, identity, signInNode]);
+
+  useEffect(() => {
+    if (!submitOpen) {
+      return undefined;
+    }
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setSubmitOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [submitOpen]);
 
   function handleSignOut() {
     window.google?.accounts?.id?.disableAutoSelect?.();
@@ -2114,6 +2263,17 @@ function Testimonials() {
     }
   }
 
+  const items = useMemo(() => {
+    if (!import.meta.env.DEV) {
+      return feed.items;
+    }
+    const requested = Number(new URLSearchParams(window.location.search).get('preview'));
+    if (!Number.isFinite(requested) || requested < 1) {
+      return feed.items;
+    }
+    return [...feed.items, ...buildPreviewItems(Math.min(requested, 60))];
+  }, [feed.items]);
+
   const emptyMessage =
     feed.status === 'loading'
       ? 'Loading recommendations...'
@@ -2121,131 +2281,226 @@ function Testimonials() {
         ? 'Recommendations are unavailable right now.'
         : 'No recommendations yet - be the first to leave one.';
 
+  const pinned = items.length > 0 && depthEnabled;
+
+  // Defined once and placed in two different slots: beside the heading when pinned,
+  // below the grid otherwise. Duplicating this JSX would mean two forms with two
+  // sets of state bugs waiting to happen.
+  const submitBlock = GOOGLE_CLIENT_ID ? (
+    <Reveal className="testimonial-form-wrap">
+      {identity ? (
+        <form className="contact-form testimonial-form" onSubmit={handleSubmit} noValidate>
+          <div className="testimonial-signed-in full">
+            <TestimonialAvatar name={identity.name} picture={identity.picture} />
+            <p>
+              Posting as <strong>{identity.name}</strong>
+            </p>
+            <button className="testimonial-signout" type="button" onClick={handleSignOut}>
+              Not you?
+            </button>
+          </div>
+
+          <label className="full">
+            Role or company <span className="testimonial-optional">(optional)</span>
+            <input
+              type="text"
+              name="role"
+              value={role}
+              maxLength={TESTIMONIAL_ROLE_MAX_LENGTH}
+              placeholder="Software Engineer at Acme"
+              onChange={(event) => setRole(event.target.value)}
+              disabled={submitting}
+            />
+          </label>
+
+          <label className="full">
+            Your recommendation
+            <textarea
+              className={formError ? 'field-error' : ''}
+              name="quote"
+              rows="4"
+              value={quote}
+              maxLength={TESTIMONIAL_MAX_LENGTH}
+              placeholder="What was it like working with me?"
+              aria-invalid={Boolean(formError)}
+              aria-describedby={formError ? 'testimonial-quote-error' : undefined}
+              onChange={(event) => setQuote(event.target.value)}
+              disabled={submitting}
+            />
+            {formError ? <FormError id="testimonial-quote-error">{formError}</FormError> : null}
+          </label>
+
+          <p>Your Google name and photo are shown with it. Your email is never published.</p>
+
+          {published ? <p className="testimonial-published">Published - thank you.</p> : null}
+
+          <button className="button button-primary full" type="submit" disabled={submitting}>
+            {submitting ? 'Publishing...' : 'Publish recommendation'}
+          </button>
+        </form>
+      ) : (
+        <div className="testimonial-signin">
+          <p className="testimonial-signin-label">
+            Sign in with Google so your name can be shown with your words.
+          </p>
+          <div className="testimonial-signin-button" ref={setSignInNode} />
+          {formError ? <FormError id="testimonial-signin-error">{formError}</FormError> : null}
+        </div>
+      )}
+    </Reveal>
+  ) : null;
+
   return (
     <section id="testimonials" className="section testimonial-space">
-      <div className="page-shell">
-        <SectionHeader eyebrow="Testimonials" title="What they said">
-          Recommendations from people I have worked, studied, and built things with.
-        </SectionHeader>
-
-        {feed.items.length > 0 ? (
-          <div className="testimonial-stage" ref={stageRef}>
-            {depthEnabled ? (
-              <Motion.div
-                className="testimonial-void"
-                aria-hidden="true"
-                style={{ y: voidY, scale: voidScale }}
-              >
-                {depthPanels.map((panel) => (
-                  <span
-                    key={`${panel.left}-${panel.top}`}
-                    className="testimonial-void-panel"
-                    style={{
-                      left: panel.left,
-                      top: panel.top,
-                      width: panel.width,
-                      height: panel.height,
-                      opacity: panel.opacity,
-                      transform: `translateZ(${panel.z}px)`,
-                    }}
-                  />
-                ))}
-              </Motion.div>
-            ) : null}
-
-            {depthEnabled ? (
-              <div className="card-grid testimonial-grid testimonial-grid-3d">
-                {feed.items.map((item, index) => (
-                  <TestimonialDepthCard
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    progress={depthProgress}
-                  />
-                ))}
+      {pinned ? (
+        // Pinned run: a tall scroll track whose inner panel sticks to the viewport.
+        // The page keeps scrolling normally - wheel events are never intercepted -
+        // but because the panel is stuck, the only thing that appears to move is the
+        // cards travelling toward the viewer. Scrolling back reverses it, since the
+        // depth is bound to scroll position rather than direction.
+        <div className="testimonial-track" ref={stageRef}>
+          <div className="testimonial-pin">
+            <div className="page-shell">
+              {/* The action rides beside the heading rather than below the grid: the
+                  pin fills the viewport, so anything under the cards is literally on
+                  the next screen and never seen while the section is on show. */}
+              <div className="testimonial-head">
+                <SectionHeader eyebrow="Testimonials" title="What they said" />
+                {submitBlock ? (
+                  <div className="testimonial-head-action">
+                    {/* Our own button, so it can say "Add yours" - Google's rendered
+                        button cannot carry those words, and squeezing their iframe
+                        into this slot is what kept producing a control that looked
+                        like a broken toggle. Their official button now lives in the
+                        panel this opens, where it has room and its branding is not
+                        fighting the heading. */}
+                    <button
+                      type="button"
+                      className="button button-primary testimonial-add"
+                      onClick={() => setSubmitOpen(true)}
+                    >
+                      Add yours
+                    </button>
+                  </div>
+                ) : null}
               </div>
-            ) : (
-              <StaggerContainer className="card-grid testimonial-grid">
-                {feed.items.map((item) => (
-                  <MotionCard key={item.id} className="content-card testimonial-card">
-                    <TestimonialCardBody item={item} />
-                  </MotionCard>
-                ))}
-              </StaggerContainer>
-            )}
+
+              <div className="testimonial-stage">
+                <Motion.div
+                  className="testimonial-void"
+                  aria-hidden="true"
+                  style={{ y: voidY, scale: voidScale }}
+                >
+                  {depthPanels.map((panel) => (
+                    <span
+                      key={`${panel.left}-${panel.top}`}
+                      className="testimonial-void-panel"
+                      style={{
+                        left: panel.left,
+                        top: panel.top,
+                        width: panel.width,
+                        height: panel.height,
+                        opacity: panel.opacity,
+                        transform: `translateZ(${panel.z}px)`,
+                      }}
+                    />
+                  ))}
+                </Motion.div>
+
+                {/* Scatter while the cards still fit the hand-placed slots - that is
+                    the realistic case and the one that matches the reference. Past
+                    that a grid is the only thing that stays legible, so the dev
+                    preview at ?preview=24 falls back to it. */}
+                {items.length <= cardSlots.length ? (
+                  <div className="testimonial-scatter">
+                    {items.map((item, index) => (
+                      <TestimonialDepthCard
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        progress={depthProgress}
+                        slot={cardSlots[index]}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="card-grid testimonial-grid testimonial-grid-3d">
+                    {items.map((item, index) => (
+                      <TestimonialDepthCard
+                        key={item.id}
+                        item={item}
+                        index={index}
+                        progress={depthProgress}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Scoped to the pin rather than the viewport: .testimonial-space is an
+                isolated stacking context, so a fixed overlay could not rise above the
+                navbar anyway. Covering the pinned panel is the same area in practice. */}
+            <AnimatePresence>
+              {submitOpen && submitBlock ? (
+                <Motion.div
+                  className="testimonial-submit-layer"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Add your recommendation"
+                  initial={reduceMotion ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: reduceMotion ? 0 : 0.18 }}
+                >
+                  <button
+                    type="button"
+                    className="testimonial-submit-scrim"
+                    aria-label="Close"
+                    onClick={() => setSubmitOpen(false)}
+                  />
+                  <div className="testimonial-submit-panel">
+                    <button
+                      type="button"
+                      className="testimonial-submit-close"
+                      onClick={() => setSubmitOpen(false)}
+                    >
+                      Close
+                    </button>
+                    {submitBlock}
+                  </div>
+                </Motion.div>
+              ) : null}
+            </AnimatePresence>
           </div>
-        ) : (
+        </div>
+      ) : null}
+
+      <div className="page-shell">
+        {/* Header lives inside the pin when pinned, so it stays with the cards. */}
+        {pinned ? null : (
+          <SectionHeader eyebrow="Testimonials" title="What they said" />
+        )}
+
+        {items.length > 0 && !pinned ? (
+          <StaggerContainer className="card-grid testimonial-grid">
+            {items.map((item) => (
+              <MotionCard key={item.id} className="content-card testimonial-card">
+                <TestimonialCardBody item={item} />
+              </MotionCard>
+            ))}
+          </StaggerContainer>
+        ) : null}
+
+        {items.length === 0 ? (
           <Reveal className="testimonial-empty">
             <p>{emptyMessage}</p>
           </Reveal>
-        )}
-
-        {/* Without a client ID the sign-in button would render broken, so the whole
-            submission block is hidden and the list above still stands on its own. */}
-        {GOOGLE_CLIENT_ID ? (
-          <Reveal className="testimonial-form-wrap">
-            {identity ? (
-              <form className="contact-form testimonial-form" onSubmit={handleSubmit} noValidate>
-                <div className="testimonial-signed-in full">
-                  <TestimonialAvatar name={identity.name} picture={identity.picture} />
-                  <p>
-                    Posting as <strong>{identity.name}</strong>
-                  </p>
-                  <button className="testimonial-signout" type="button" onClick={handleSignOut}>
-                    Not you?
-                  </button>
-                </div>
-
-                <label className="full">
-                  Role or company <span className="testimonial-optional">(optional)</span>
-                  <input
-                    type="text"
-                    name="role"
-                    value={role}
-                    maxLength={TESTIMONIAL_ROLE_MAX_LENGTH}
-                    placeholder="Software Engineer at Acme"
-                    onChange={(event) => setRole(event.target.value)}
-                    disabled={submitting}
-                  />
-                </label>
-
-                <label className="full">
-                  Your recommendation
-                  <textarea
-                    className={formError ? 'field-error' : ''}
-                    name="quote"
-                    rows="5"
-                    value={quote}
-                    maxLength={TESTIMONIAL_MAX_LENGTH}
-                    placeholder="What was it like working with me?"
-                    aria-invalid={Boolean(formError)}
-                    aria-describedby={formError ? 'testimonial-quote-error' : undefined}
-                    onChange={(event) => setQuote(event.target.value)}
-                    disabled={submitting}
-                  />
-                  {formError ? <FormError id="testimonial-quote-error">{formError}</FormError> : null}
-                </label>
-
-                <p>Your Google name and profile photo are shown with it. Your email address is never published. It goes live right away.</p>
-
-                {published ? <p className="testimonial-published">Published - thank you.</p> : null}
-
-                <button className="button button-primary full" type="submit" disabled={submitting}>
-                  {submitting ? 'Publishing...' : 'Publish recommendation'}
-                </button>
-              </form>
-            ) : (
-              <div className="testimonial-signin">
-                <div>
-                  <h3>Worked with me?</h3>
-                  <p>Sign in with Google to leave a recommendation. It publishes immediately under your Google name.</p>
-                  {formError ? <FormError id="testimonial-signin-error">{formError}</FormError> : null}
-                </div>
-                <div className="testimonial-signin-button" ref={signInRef} />
-              </div>
-            )}
-          </Reveal>
         ) : null}
+
+        {/* Not pinned (mobile, reduced motion, or an empty list): the action goes
+            back under the grid where there is normal page flow to sit in. */}
+        {pinned ? null : submitBlock}
       </div>
     </section>
   );
