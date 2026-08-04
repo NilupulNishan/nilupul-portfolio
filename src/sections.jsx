@@ -2058,6 +2058,7 @@ function Testimonials() {
   const stageRef = useRef(null);
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
+  const viewportWidth = useViewportWidth();
 
   // Phones get the flat fade-up instead: a dozen composited 3D layers is exactly
   // where touch devices stutter, and the effect is barely legible on a small screen.
@@ -2419,8 +2420,11 @@ function Testimonials() {
                 {/* Scatter while the cards still fit the hand-placed slots - that is
                     the realistic case and the one that matches the reference. Past
                     that a grid is the only thing that stays legible, so the dev
-                    preview at ?preview=24 falls back to it. */}
-                {items.length <= cardSlots.length ? (
+                    preview at ?preview=24 falls back to it.
+                    The width gate matters too: the slots are absolutely positioned at
+                    fixed pixel widths tuned for a ~1240px shell, so below 1100px they
+                    overlap. Narrow desktop windows get the grid instead. */}
+                {items.length <= cardSlots.length && viewportWidth > 1100 ? (
                   <div className="testimonial-scatter">
                     {items.map((item, index) => (
                       <TestimonialDepthCard
