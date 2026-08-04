@@ -3511,27 +3511,44 @@ iframe {
   line-height: 1.5;
 }
 
-/* Google renders its own iframe button in here. The iframe itself is untouchable,
-   but the wrapper is ours - so the button gets tied into the theme with an accent
-   ring and glow rather than by trying to restyle Google's chrome.
-
-   Deliberately NOT using filter: invert/hue-rotate. That would recolour the G, which
-   breaks Google's branding rules and is exactly the kind of thing that gets a client
-   ID flagged. Ring and glow only; the button inside stays untouched. */
-/* IMPORTANT: `renderButton` injects real DOM into the page - it is NOT an iframe, so
-   everything here cascades into Google's own button markup.
-   A previous `line-height: 0` on this wrapper (added to remove an inline gap that was
-   never there) collapsed the "Sign in" label to zero height, leaving just the G logo
-   floating in an empty pill. Do not set line-height, font-size, or colour here. */
-/* `renderButton` renders an <iframe> from accounts.google.com. Nothing in this
-   stylesheet can reach inside it, so there is nothing here to "fix" - and every
-   attempt to style it has instead broken it from the outside:
-     - `line-height: 0`      collapsed the wrapper around the iframe
-     - fixed size + overflow  cropped the iframe in half
-   Keep this rule minimal. Size, theme and shape belong in renderButton's options,
-   not here. inline-flex only removes the inline-baseline gap under the iframe. */
-.testimonial-signin-button {
+/* Our own button - real markup, so it is fully styleable. Google's rendered
+   iframe button is gone, and with it the personalised variant and every cropping and
+   cascade problem that came from trying to style something we did not own.
+   Branding note: the four-colour mark and the exact phrase "Sign in with Google" are
+   required by Google's terms on a custom button. Restyle the frame freely; do not
+   recolour the mark or reword the label. */
+.google-signin {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: #131314;
+  padding: 11px 22px;
+  color: #e3e3e3;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+}
+
+.google-signin:hover {
+  border-color: rgba(255, 125, 31, 0.5);
+  background: #1a1b1c;
+  box-shadow: 0 0 24px rgba(255, 125, 31, 0.14);
+}
+
+.google-signin:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 125, 31, 0.25);
+}
+
+.google-signin svg {
+  flex: 0 0 auto;
 }
 
 .testimonial-form {

@@ -77,35 +77,41 @@ function siteOrigin(request) {
   return `${proto}://${host}`;
 }
 
-// A client-decoded JWT is just a string the submitter could have typed by hand, so
-// the token is checked server-side. Google's tokeninfo endpoint does the signature
-// work, which saves both a JWKS cache and the google-auth-library dependency - one
-// extra network hop per submission, irrelevant at this volume.
-async function verifyGoogleToken(credential) {
+// The browser now uses Google's OAuth token flow (initTokenClient) instead of the
+// rendered Sign-In button, so what arrives here is an *access token*, not a signed
+// ID token. That difference matters:
+//
+//   An ID token is a JWT signed for us - tampering invalidates the signature.
+//   An access token is an opaque bearer string that carries no audience of its own.
+//
+// So the `aud` check below is not a formality, it is the entire security boundary.
+// Without it, anyone could take an access token issued to *any other* Google app with
+// the same scopes, POST it here, and userinfo would cheerfully return their profile -
+// letting them post as a verified Google user through an app we do not control. This
+// is the classic confused-deputy hole in token-based sign-in.
+async function verifyGoogleAccessToken(accessToken) {
   const clientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
 
-  if (!clientId || !credential || typeof credential !== 'string') {
+  if (!clientId || !accessToken || typeof accessToken !== 'string') {
     return null;
   }
 
-  const endpoint = `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`;
-  const response = await fetch(endpoint);
+  const infoResponse = await fetch(
+    `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(accessToken)}`,
+  );
 
-  if (!response.ok) {
+  if (!infoResponse.ok) {
     return null;
   }
 
-  const info = await response.json().catch(() => null);
+  const info = await infoResponse.json().catch(() => null);
 
   if (!info || !info.sub) {
     return null;
   }
 
+  // THE critical check - see the comment above before touching this.
   if (info.aud !== clientId) {
-    return null;
-  }
-
-  if (info.iss !== 'accounts.google.com' && info.iss !== 'https://accounts.google.com') {
     return null;
   }
 
@@ -118,7 +124,20 @@ async function verifyGoogleToken(credential) {
     return null;
   }
 
-  return info;
+  // tokeninfo carries identity but no display name or photo, so the profile needs a
+  // second call. Only decorative fields come from here - `sub` and `email` stay bound
+  // to the verified token above.
+  const profileResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const profile = profileResponse.ok ? await profileResponse.json().catch(() => ({})) : {};
+
+  return {
+    sub: info.sub,
+    email: info.email || profile.email || '',
+    name: profile.name || '',
+    picture: profile.picture || '',
+  };
 }
 
 // Plain text, not HTML: submitted content lands in this email verbatim, and plain
@@ -202,7 +221,7 @@ async function handlePost(request, response) {
     // A throttle failure is not a reason to reject a legitimate testimonial.
   }
 
-  const identity = await verifyGoogleToken(body.credential);
+  const identity = await verifyGoogleAccessToken(body.accessToken);
 
   if (!identity) {
     sendJson(response, 401, { error: 'Google sign-in could not be verified.' });

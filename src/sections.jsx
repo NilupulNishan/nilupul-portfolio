@@ -1840,18 +1840,17 @@ const TESTIMONIAL_MIN_LENGTH = 10;
 const TESTIMONIAL_MAX_LENGTH = 1000;
 const TESTIMONIAL_ROLE_MAX_LENGTH = 120;
 
-// Display only - the same token is re-verified server-side before anything is
-// stored, so nothing here is trusted for identity.
-function decodeGoogleCredential(credential) {
-  try {
-    const segment = String(credential).split('.')[1];
-    const base64 = segment.replace(/-/g, '+').replace(/_/g, '/');
-    const bytes = Uint8Array.from(window.atob(base64), (character) => character.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(bytes));
-  } catch {
-    return null;
-  }
-}
+// Google's own four-colour mark. Their branding terms require the real logo and one
+// of their approved phrases on any custom sign-in button, so this is the official
+// artwork rather than a generic icon-font "G".
+const GoogleMark = (props) => (
+  <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" {...props}>
+    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+  </svg>
+);
 
 // Google avatar URLs are not stable - they 404 once someone changes their photo -
 // so the fallback is required, not decorative.
@@ -2055,12 +2054,7 @@ function Testimonials() {
   const [submitting, setSubmitting] = useState(false);
   const [published, setPublished] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
-  // A callback ref held in state, not a plain useRef. The sign-in block moves between
-  // two slots (beside the heading when pinned, under the grid when not), and the feed
-  // arriving flips `pinned` after mount - which unmounts the div Google rendered its
-  // button into and mounts a fresh one. With a plain ref the effect below never re-ran,
-  // so the button silently vanished. State makes the remount a dependency change.
-  const [signInNode, setSignInNode] = useState(null);
+  const tokenClientRef = useRef(null);
   const stageRef = useRef(null);
   const leanMotion = useLeanMotion();
   const reduceMotion = useReducedMotion();
@@ -2155,59 +2149,56 @@ function Testimonials() {
     return undefined;
   }, []);
 
+  // Google's OAuth token flow instead of their rendered button. requestAccessToken()
+  // opens Google's own popup, so the trust boundary is unchanged - what we gain is
+  // that no Google-controlled iframe lives in our DOM, which is what made the button
+  // impossible to style and prone to the personalised variant.
   useEffect(() => {
-    if (!GOOGLE_CLIENT_ID || !googleReady || identity || !signInNode) {
+    if (!GOOGLE_CLIENT_ID || !googleReady || tokenClientRef.current) {
       return;
     }
 
-    const googleId = window.google?.accounts?.id;
-    if (!googleId) {
+    const oauth2 = window.google?.accounts?.oauth2;
+    if (!oauth2) {
       return;
     }
 
-    googleId.initialize({
+    tokenClientRef.current = oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
-      callback: (response) => {
-        const profile = decodeGoogleCredential(response?.credential);
-        if (!profile) {
-          setFormError('Google sign-in failed. Please try again.');
+      scope: 'openid email profile',
+      callback: async (response) => {
+        if (!response?.access_token) {
+          setFormError('Google sign-in was cancelled.');
           return;
         }
-        setCredential(response.credential);
-        setIdentity({ name: profile.name || profile.email || 'You', picture: profile.picture || '' });
+
+        setCredential(response.access_token);
         setFormError('');
+
+        // Display only. The server re-verifies this same token and takes identity
+        // from its own lookup, so nothing here is trusted.
+        try {
+          const profileResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${response.access_token}` },
+          });
+          const profile = await profileResponse.json().catch(() => ({}));
+          setIdentity({ name: profile.name || profile.email || 'You', picture: profile.picture || '' });
+        } catch {
+          setIdentity({ name: 'You', picture: '' });
+        }
       },
+      error_callback: () => setFormError('Google sign-in was cancelled.'),
     });
+  }, [googleReady]);
 
-    // Google's official dark pill. The button is an iframe and cannot be restyled,
-    // so these four options are the entire design surface - filled_black is the
-    // darkest variant Google ships, and it sits closest to the site's near-black
-    // panels. Kept as Google's real button rather than driving One Tap from a custom
-    // one, which browsers can silently suppress.
-    // Google appends its iframe rather than replacing what is already there, so a
-    // node that has been rendered into before ends up holding a stale button from
-    // the previous options. Clearing first guarantees exactly one iframe.
-    signInNode.replaceChildren();
-
-    googleId.renderButton(signInNode, {
-      // Back to the original full button - it is the one that actually rendered
-      // correctly. This is an <iframe> served by accounts.google.com, so these options
-      // are the *only* control we have over its appearance; no CSS on our side reaches
-      // inside it.
-      //
-      // Note: with an active Google session the standard button may render Google's
-      // personalised variant ("Sign in as <name>" plus the account email). That is
-      // Google's behaviour and cannot be disabled.
-      type: 'standard',
-      theme: 'filled_black',
-      size: 'large',
-      shape: 'pill',
-      text: 'signin_with',
-    });
-    // signInNode is a dependency on purpose: when the block moves between the pinned
-    // and unpinned slots the old node is destroyed, and the button has to be drawn
-    // into the new one.
-  }, [googleReady, identity, signInNode]);
+  function handleGoogleSignIn() {
+    if (!tokenClientRef.current) {
+      setFormError('Google sign-in is still loading. Try again in a moment.');
+      return;
+    }
+    setFormError('');
+    tokenClientRef.current.requestAccessToken();
+  }
 
   useEffect(() => {
     if (!submitOpen) {
@@ -2223,7 +2214,11 @@ function Testimonials() {
   }, [submitOpen]);
 
   function handleSignOut() {
-    window.google?.accounts?.id?.disableAutoSelect?.();
+    // Revoke the access token rather than just forgetting it, so "Not you?" actually
+    // ends the grant instead of leaving a live token in Google's session.
+    if (credential) {
+      window.google?.accounts?.oauth2?.revoke?.(credential, () => {});
+    }
     setIdentity(null);
     setCredential('');
     setPublished(false);
@@ -2252,7 +2247,7 @@ function Testimonials() {
       const response = await fetch('/api/testimonials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential, quote: trimmedQuote, role: role.trim() }),
+        body: JSON.stringify({ accessToken: credential, quote: trimmedQuote, role: role.trim() }),
       });
       const data = await response.json().catch(() => ({}));
 
@@ -2351,7 +2346,13 @@ function Testimonials() {
           <p className="testimonial-signin-label">
             Sign in with Google so your name can be shown with your words.
           </p>
-          <div className="testimonial-signin-button" ref={setSignInNode} />
+          {/* Our own markup, not Google's iframe. Their branding terms still apply to
+              a custom button: the real four-colour mark plus one of their approved
+              phrases. Do not reword this label. */}
+          <button type="button" className="google-signin" onClick={handleGoogleSignIn}>
+            <GoogleMark />
+            <span>Sign in with Google</span>
+          </button>
           {formError ? <FormError id="testimonial-signin-error">{formError}</FormError> : null}
         </div>
       )}
