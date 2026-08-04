@@ -3022,9 +3022,87 @@ iframe {
 /* ============================================================
    Testimonials - Google-authenticated recommendations
    ============================================================ */
+/* The section becomes a dark void the page passes through. Scoped here only - the
+   rest of Home keeps its normal surface. */
+.testimonial-space {
+  position: relative;
+  isolation: isolate;
+  /* Cards translate toward the viewer; without this they would ride up over the
+     sticky navbar on the way past. */
+  overflow: clip;
+  background: #050506;
+}
+
+:root[data-theme='light'] .testimonial-space {
+  background: #0a0b0c;
+}
+
+/* Receding grid floor + vignette. The backdrop may sit in perspective; the cards
+   themselves never rotate. */
+.testimonial-space::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(255, 125, 31, 0.08), transparent 70%),
+    radial-gradient(circle at 50% 120%, rgba(255, 125, 31, 0.1), transparent 55%),
+    repeating-linear-gradient(to right, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 84px),
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 84px);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 25%, transparent 78%);
+}
+
+/* Faint point field, so the emptiness reads as space rather than as a flat panel. */
+.testimonial-space::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0.6px, transparent 0.7px),
+    radial-gradient(circle, rgba(255, 125, 31, 0.45) 0.6px, transparent 0.7px);
+  background-size: 118px 118px, 173px 173px;
+  background-position: 0 0, 46px 62px;
+  opacity: 0.35;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, #000 10%, transparent 72%);
+}
+
+.testimonial-stage {
+  position: relative;
+}
+
+/* Abstract only: empty lit rectangles. Never text, never names, never faces. */
+.testimonial-void {
+  position: absolute;
+  inset: -8% -4%;
+  z-index: -1;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.testimonial-void-panel {
+  position: absolute;
+  border: 1px solid rgba(255, 125, 31, 0.55);
+  border-radius: var(--radius);
+  background: linear-gradient(140deg, rgba(255, 125, 31, 0.14), rgba(255, 255, 255, 0.03));
+  box-shadow: 0 0 22px rgba(255, 125, 31, 0.18);
+}
+
 .testimonial-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
+}
+
+/* Perspective sits on the grid so the cards are direct children - no need to thread
+   preserve-3d through wrappers. */
+.testimonial-grid-3d {
+  perspective: 1100px;
+}
+
+.testimonial-grid-3d .testimonial-card {
+  /* Keeps text rasterised crisply at the translateZ(0) rest state. */
+  backface-visibility: hidden;
 }
 
 .testimonial-card {
@@ -3032,6 +3110,21 @@ iframe {
   flex-direction: column;
   gap: 18px;
   padding: 26px;
+  /* Reads as a lit panel suspended in the void rather than a card on a page. */
+  border-color: rgba(255, 125, 31, 0.28);
+  background: linear-gradient(155deg, rgba(20, 21, 22, 0.94), rgba(8, 9, 10, 0.9));
+  box-shadow:
+    0 0 0 1px rgba(255, 125, 31, 0.06),
+    0 18px 50px rgba(0, 0, 0, 0.55),
+    0 0 40px rgba(255, 125, 31, 0.1);
+}
+
+.testimonial-card:hover {
+  border-color: rgba(255, 125, 31, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 125, 31, 0.12),
+    0 18px 50px rgba(0, 0, 0, 0.6),
+    0 0 56px rgba(255, 125, 31, 0.18);
 }
 
 .testimonial-card blockquote {
@@ -3590,6 +3683,11 @@ iframe {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  /* Shallower perspective so the approach stays comfortable in two columns. */
+  .testimonial-grid-3d {
+    perspective: 1400px;
+  }
+
   .contact-card {
     align-items: start;
   }
@@ -3757,6 +3855,21 @@ iframe {
 
   .testimonial-signin {
     grid-template-columns: 1fr;
+  }
+
+  /* useLeanMotion already sends touch devices down the flat fallback path, so the
+     3D grid should not render here at all - this is belt and braces for the case
+     where a wide touch device slips through. */
+  .testimonial-grid-3d {
+    perspective: none;
+  }
+
+  .testimonial-void {
+    display: none;
+  }
+
+  .testimonial-space::after {
+    opacity: 0.22;
   }
 
   .contact-cta {

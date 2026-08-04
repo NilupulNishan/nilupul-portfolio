@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion as Motion, useReducedMotion } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion as Motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   FaArrowLeft,
@@ -1879,6 +1886,55 @@ function TestimonialAvatar({ name, picture }) {
   );
 }
 
+// Abstract only - empty panels, grid fragments and light bars. Deliberately no
+// names, faces or text: filling the distance with lookalike testimonial cards
+// would imply recommendations that do not exist.
+const depthPanels = [
+  { left: '4%', top: '14%', width: 120, height: 74, z: -980, opacity: 0.16 },
+  { left: '20%', top: '68%', width: 86, height: 54, z: -1240, opacity: 0.12 },
+  { left: '32%', top: '8%', width: 150, height: 90, z: -760, opacity: 0.2 },
+  { left: '54%', top: '76%', width: 110, height: 68, z: -900, opacity: 0.15 },
+  { left: '72%', top: '18%', width: 96, height: 60, z: -1120, opacity: 0.13 },
+  { left: '86%', top: '58%', width: 132, height: 80, z: -820, opacity: 0.18 },
+  { left: '12%', top: '40%', width: 64, height: 40, z: -1420, opacity: 0.1 },
+  { left: '64%', top: '44%', width: 72, height: 44, z: -1320, opacity: 0.11 },
+];
+
+function TestimonialCardBody({ item }) {
+  return (
+    <>
+      <blockquote>{item.quote}</blockquote>
+      <div className="testimonial-attribution">
+        <TestimonialAvatar name={item.name} picture={item.picture} />
+        <div>
+          <p className="testimonial-name">{item.name}</p>
+          {item.role ? <p className="testimonial-role">{item.role}</p> : null}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Depth is tied to scroll *position*, not scroll direction: the card approaches on
+// the way down and recedes on the way up for free, and a half-finished scroll rests
+// half-way instead of snapping. Direction-linking would need state and would jump
+// whenever you reversed mid-gesture.
+function TestimonialDepthCard({ item, index, progress }) {
+  // Each card starts further back than the last so they arrive as a cluster
+  // rather than one flat slab sliding forward.
+  const startZ = -540 - index * 110;
+  const exitZ = 70 + index * 18;
+
+  const z = useTransform(progress, [0, 0.46, 1], [startZ, 0, exitZ]);
+  const opacity = useTransform(progress, [0, 0.2, 0.82, 1], [0, 1, 1, 0.4]);
+
+  return (
+    <Motion.div className="content-card testimonial-card" style={{ z, opacity }}>
+      <TestimonialCardBody item={item} />
+    </Motion.div>
+  );
+}
+
 function Testimonials() {
   const [feed, setFeed] = useState({ status: 'loading', items: [], error: null });
   const [googleReady, setGoogleReady] = useState(false);
@@ -1890,6 +1946,33 @@ function Testimonials() {
   const [submitting, setSubmitting] = useState(false);
   const [published, setPublished] = useState(false);
   const signInRef = useRef(null);
+  const stageRef = useRef(null);
+  const leanMotion = useLeanMotion();
+  const reduceMotion = useReducedMotion();
+
+  // Phones get the flat fade-up instead: a dozen composited 3D layers is exactly
+  // where touch devices stutter, and the effect is barely legible on a small screen.
+  const depthEnabled = !leanMotion && !reduceMotion;
+
+  const { scrollYProgress } = useScroll({
+    target: stageRef,
+    offset: ['start end', 'end start'],
+  });
+  const depthProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    mass: 0.4,
+  });
+
+  // The backdrop drifts as one layer on a single MotionValue rather than a hook per
+  // panel - eight subscriptions for a purely decorative parallax is not worth it.
+  //
+  // Driven by y/scale, not z: the layer's own translateZ would need a perspective on
+  // .testimonial-stage, and adding one there would nest inside the grid's own
+  // perspective and compound it. The panels still get real depth because the layer
+  // itself establishes the perspective for its children.
+  const voidY = useTransform(depthProgress, [0, 1], [-70, 80]);
+  const voidScale = useTransform(depthProgress, [0, 1], [0.92, 1.1]);
 
   const loadTestimonials = useCallback(async () => {
     try {
@@ -2039,27 +2122,58 @@ function Testimonials() {
         : 'No recommendations yet - be the first to leave one.';
 
   return (
-    <section id="testimonials" className="section">
+    <section id="testimonials" className="section testimonial-space">
       <div className="page-shell">
         <SectionHeader eyebrow="Testimonials" title="What they said">
           Recommendations from people I have worked, studied, and built things with.
         </SectionHeader>
 
         {feed.items.length > 0 ? (
-          <StaggerContainer className="card-grid testimonial-grid">
-            {feed.items.map((item) => (
-              <MotionCard key={item.id} className="content-card testimonial-card">
-                <blockquote>{item.quote}</blockquote>
-                <div className="testimonial-attribution">
-                  <TestimonialAvatar name={item.name} picture={item.picture} />
-                  <div>
-                    <p className="testimonial-name">{item.name}</p>
-                    {item.role ? <p className="testimonial-role">{item.role}</p> : null}
-                  </div>
-                </div>
-              </MotionCard>
-            ))}
-          </StaggerContainer>
+          <div className="testimonial-stage" ref={stageRef}>
+            {depthEnabled ? (
+              <Motion.div
+                className="testimonial-void"
+                aria-hidden="true"
+                style={{ y: voidY, scale: voidScale }}
+              >
+                {depthPanels.map((panel) => (
+                  <span
+                    key={`${panel.left}-${panel.top}`}
+                    className="testimonial-void-panel"
+                    style={{
+                      left: panel.left,
+                      top: panel.top,
+                      width: panel.width,
+                      height: panel.height,
+                      opacity: panel.opacity,
+                      transform: `translateZ(${panel.z}px)`,
+                    }}
+                  />
+                ))}
+              </Motion.div>
+            ) : null}
+
+            {depthEnabled ? (
+              <div className="card-grid testimonial-grid testimonial-grid-3d">
+                {feed.items.map((item, index) => (
+                  <TestimonialDepthCard
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    progress={depthProgress}
+                  />
+                ))}
+              </div>
+            ) : (
+              <StaggerContainer className="card-grid testimonial-grid">
+                {feed.items.map((item) => (
+                  <MotionCard key={item.id} className="content-card testimonial-card">
+                    <TestimonialCardBody item={item} />
+                  </MotionCard>
+                ))}
+              </StaggerContainer>
+            )}
+          </div>
         ) : (
           <Reveal className="testimonial-empty">
             <p>{emptyMessage}</p>
