@@ -3523,29 +3523,15 @@ iframe {
    A previous `line-height: 0` on this wrapper (added to remove an inline gap that was
    never there) collapsed the "Sign in" label to zero height, leaving just the G logo
    floating in an empty pill. Do not set line-height, font-size, or colour here. */
+/* `renderButton` renders an <iframe> from accounts.google.com. Nothing in this
+   stylesheet can reach inside it, so there is nothing here to "fix" - and every
+   attempt to style it has instead broken it from the outside:
+     - `line-height: 0`      collapsed the wrapper around the iframe
+     - fixed size + overflow  cropped the iframe in half
+   Keep this rule minimal. Size, theme and shape belong in renderButton's options,
+   not here. inline-flex only removes the inline-baseline gap under the iframe. */
 .testimonial-signin-button {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* A fixed circular frame, so the control looks identical no matter what Google
-     renders inside it. Without this the button was a white square with the logo
-     clipped off its edge in production but fine locally - Vite serves CSS as separate
-     style tags in dev and one sheet in prod, which changes source order against
-     Google's own injected stylesheet, so our globals won in one and lost in the other. */
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  overflow: hidden;
-  transition: box-shadow 220ms ease;
-}
-
-/* The global `button, input, select, textarea { font: inherit }` near the top of this
-   file is a *shorthand* - it rewrites font-size, font-weight and line-height together,
-   handing Google's button the body's 1.6 line-height and inflating its internal box.
-   Undone for this subtree only; do not remove without checking the button again. */
-.testimonial-signin-button button,
-.testimonial-signin-button [role='button'] {
-  line-height: normal;
 }
 
 .testimonial-form {

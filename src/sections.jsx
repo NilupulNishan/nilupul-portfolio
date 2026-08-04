@@ -2190,16 +2190,19 @@ function Testimonials() {
     signInNode.replaceChildren();
 
     googleId.renderButton(signInNode, {
-      // Icon, not standard. With an active Chrome session Google swaps the standard
-      // button for a *personalised* one - "Sign in as <name>" plus the account email -
-      // which renders light no matter what `theme` says, is far wider, and leaks the
-      // visitor's email address onto the page. There is no option to turn that off.
-      // The icon variant is session-independent, so every visitor sees the same dark
-      // mark. The panel copy above it explains what it does.
-      type: 'icon',
+      // Back to the original full button - it is the one that actually rendered
+      // correctly. This is an <iframe> served by accounts.google.com, so these options
+      // are the *only* control we have over its appearance; no CSS on our side reaches
+      // inside it.
+      //
+      // Note: with an active Google session the standard button may render Google's
+      // personalised variant ("Sign in as <name>" plus the account email). That is
+      // Google's behaviour and cannot be disabled.
+      type: 'standard',
       theme: 'filled_black',
       size: 'large',
-      shape: 'circle',
+      shape: 'pill',
+      text: 'signin_with',
     });
     // signInNode is a dependency on purpose: when the block moves between the pinned
     // and unpinned slots the old node is destroyed, and the button has to be drawn
