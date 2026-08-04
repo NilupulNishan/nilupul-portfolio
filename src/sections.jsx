@@ -1996,12 +1996,12 @@ const restOffsets = [0, 38, -24, 54, -14, 28];
 // Widths bottom out around 230px because below that the quote starts wrapping every
 // three or four words and stops being comfortably readable.
 const cardSlots = [
-  { left: '2%', top: '4%', width: 300 },
-  { left: '42%', top: '30%', width: 250 },
-  { left: '72%', top: '2%', width: 278 },
-  { left: '10%', top: '60%', width: 258 },
-  { left: '48%', top: '66%', width: 292 },
-  { left: '76%', top: '48%', width: 232 },
+  { left: '3%', top: '5%', width: 272 },
+  { left: '43%', top: '32%', width: 228 },
+  { left: '71%', top: '3%', width: 252 },
+  { left: '12%', top: '62%', width: 236 },
+  { left: '47%', top: '67%', width: 264 },
+  { left: '74%', top: '50%', width: 214 },
 ];
 
 function TestimonialDepthCard({ item, index, progress, slot }) {
@@ -2014,18 +2014,21 @@ function TestimonialDepthCard({ item, index, progress, slot }) {
   // cards had already flown past before the section was properly settled on screen.
   // Small offsets plus a window covering most of the track means every card spends
   // the bulk of the pin inside the readable band.
-  const phase = Math.min(0.16, index * 0.04);
-  const z = useTransform(progress, [phase, phase + 0.84], [-1400, 420]);
+  const phase = Math.min(0.12, index * 0.03);
+  // Shorter travel than before (1450px, was 1820px). The longer the flight, the more
+  // of it is spent fading, so cards were arriving and leaving almost immediately.
+  const z = useTransform(progress, [phase, phase + 0.86], [-1150, 300]);
 
   // Opacity keyed to the card's own depth, not to global scroll progress - that is
   // what makes the near ones fade as they close on the viewer while the ones still
   // deep in the field fade up. Driving it from progress made every card fade in
   // unison regardless of where it actually was.
   //
-  // The solid band is deliberately wide: cards hold full opacity from -1000 all the
-  // way to -40, so the fade reads as passing the viewer rather than as vanishing
-  // early for no visible reason.
-  const opacity = useTransform(z, [-1400, -1000, -40, 360], [0, 1, 1, 0]);
+  // Solid across ~72% of the flight, up from ~53%. A card that spends half its
+  // journey fading looks like it is leaving the moment it arrives - which is exactly
+  // how it read. Fade-in is kept short and fade-out starts only once the card is
+  // genuinely past the viewer.
+  const opacity = useTransform(z, [-1150, -900, 140, 300], [0, 1, 1, 0]);
 
   const style = slot
     ? { z, opacity, left: slot.left, top: slot.top, width: slot.width }
@@ -2073,12 +2076,14 @@ function Testimonials() {
     target: stageRef,
     offset: ['start start', 'end end'],
   });
-  // Stiffer and lighter than before: the smoothing was adding noticeable lag behind
-  // the wheel, which read as the whole section being sluggish.
+  // Tuned for a fast, tight response. Most of the "sluggish" feel came from spring
+  // lag rather than travel distance, so stiffness does more work here than the track
+  // height does. Damping stays high enough to avoid overshoot, which at this speed
+  // would read as wobble.
   const depthProgress = useSpring(scrollYProgress, {
-    stiffness: 160,
-    damping: 28,
-    mass: 0.28,
+    stiffness: 210,
+    damping: 30,
+    mass: 0.22,
   });
 
   // The backdrop drifts as one layer on a single MotionValue rather than a hook per
@@ -2185,16 +2190,16 @@ function Testimonials() {
     signInNode.replaceChildren();
 
     googleId.renderButton(signInNode, {
-      // `text: 'signin'` renders just "Sign in" - the shortest of the four phrases
-      // Google permits. It cannot say "Add yours": renderButton only accepts
-      // signin_with / signup_with / continue_with / signin, and Google's branding
-      // terms require one of those beside the G even on a custom button. So the
-      // adjacent label carries the call to action and this stays the mechanism.
-      type: 'standard',
+      // Icon, not standard. With an active Chrome session Google swaps the standard
+      // button for a *personalised* one - "Sign in as <name>" plus the account email -
+      // which renders light no matter what `theme` says, is far wider, and leaks the
+      // visitor's email address onto the page. There is no option to turn that off.
+      // The icon variant is session-independent, so every visitor sees the same dark
+      // mark. The panel copy above it explains what it does.
+      type: 'icon',
       theme: 'filled_black',
       size: 'large',
-      shape: 'pill',
-      text: 'signin',
+      shape: 'circle',
     });
     // signInNode is a dependency on purpose: when the block moves between the pinned
     // and unpinned slots the old node is destroyed, and the button has to be drawn

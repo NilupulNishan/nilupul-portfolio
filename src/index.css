@@ -3103,10 +3103,12 @@ iframe {
    thing that appears to move is the cards. Lengthen for a slower approach. */
 /* Main speed dial: the whole flight happens across (height - 100vh) of scrolling,
    so 200vh means one viewport of travel. Raise to slow down, lower to speed up.
-   Now that the stagger is fixed, 170vh is quick without cards finishing early. */
+   145vh is about as short as this goes: below roughly 130vh the pin barely holds
+   before releasing, and a card's readable window drops under a third of a viewport
+   of scrolling - past that it is moving too fast to actually read. */
 .testimonial-track {
   position: relative;
-  height: 170vh;
+  height: 145vh;
 }
 
 /* The site-wide vertical rails come from `.section > .page-shell`'s border-inline.
@@ -3361,9 +3363,18 @@ iframe {
   flex-direction: column;
   gap: 16px;
   padding: clamp(20px, 1.6vw, 26px);
-  /* Reads as a lit panel suspended in the void rather than a card on a page. */
+  /* Reads as a lit panel suspended in the void rather than a card on a page. More
+     see-through than before so the field shows behind it - the blur is what keeps the
+     quote readable over the lattice and the panels drifting underneath. */
   border-color: rgba(255, 125, 31, 0.28);
-  background: linear-gradient(155deg, rgba(20, 21, 22, 0.94), rgba(8, 9, 10, 0.9));
+  background: linear-gradient(155deg, rgba(20, 21, 22, 0.78), rgba(8, 9, 10, 0.72));
+  /* Kept modest deliberately. backdrop-filter is one of the most expensive things a
+     browser can composite, and these are six elements animating transform and opacity
+     at once - a heavy blur here shows up as dropped frames, which costs more than the
+     effect is worth. The slightly higher background alpha above covers the contrast
+     the reduced blur no longer provides. */
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow:
     0 0 0 1px rgba(255, 125, 31, 0.06),
     0 18px 50px rgba(0, 0, 0, 0.55),
