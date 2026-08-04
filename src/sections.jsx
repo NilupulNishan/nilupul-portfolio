@@ -2028,7 +2028,7 @@ function TestimonialDepthCard({ item, index, progress, slot }) {
   // journey fading looks like it is leaving the moment it arrives - which is exactly
   // how it read. Fade-in is kept short and fade-out starts only once the card is
   // genuinely past the viewer.
-  const opacity = useTransform(z, [-1150, -900, 140, 300], [0, 1, 1, 0]);
+  const opacity = useTransform(z, [-1300, -700, 90, 300], [0, 1, 1, 0]);
 
   const style = slot
     ? { z, opacity, left: slot.left, top: slot.top, width: slot.width }
