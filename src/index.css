@@ -358,6 +358,127 @@ iframe {
   position: relative;
 }
 
+/* ---- Experience sub-menu -------------------------------------------------
+   Five Home sections hide under the Experience nav item; this surfaces them.
+   Named `nav-submenu` to stay clear of the unused `.nav-dropdown` rules above. */
+
+/* Trigger and panel live in one hover container with no gap between them, so a
+   cursor moving diagonally into the menu never crosses dead space and dismisses it. */
+.nav-item-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  padding: 8px 6px 8px 2px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 200ms ease, transform 200ms ease;
+}
+
+.nav-caret svg {
+  font-size: 0.62rem;
+  transition: transform 200ms ease;
+}
+
+.nav-item-group:hover .nav-caret,
+.nav-caret:focus-visible {
+  color: var(--text-strong);
+}
+
+.nav-caret[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.nav-submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 130;
+  display: grid;
+  min-width: 208px;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-menu, var(--bg-elevated));
+  padding: 8px;
+  /* Hidden but still laid out, so opening costs no layout work. visibility keeps it
+     out of the tab order while closed. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 180ms ease, transform 180ms ease, visibility 180ms;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+}
+
+/* No gap between trigger and panel - the padding sits inside the panel's own box so
+   the hover target is continuous. */
+.nav-item-group:hover .nav-submenu,
+.nav-submenu.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-links .nav-submenu a {
+  min-height: 34px;
+  padding: 7px 12px;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.nav-links .nav-submenu a:hover,
+.nav-links .nav-submenu a.active-nav {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-strong);
+}
+
+/* The parent's underline sweep would read as a second active state inside the panel. */
+.nav-links .nav-submenu a::after {
+  content: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-submenu {
+    transition: none;
+  }
+}
+
+/* Mobile: no hover exists, and hiding five links behind another tap would recreate
+   the discovery problem this is meant to solve - so they are always visible. */
+.mobile-nav-group {
+  display: grid;
+  gap: 2px;
+}
+
+.mobile-subnav {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 6px;
+  border-left: 1px solid var(--line-soft);
+  padding-left: 10px;
+  margin-left: 14px;
+}
+
+.mobile-menu .mobile-subnav a {
+  min-height: 40px;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.mobile-menu .mobile-subnav a.active-nav {
+  color: var(--accent);
+}
+
 .nav-dropdown-trigger {
   display: inline-flex;
   align-items: center;

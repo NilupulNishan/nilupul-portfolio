@@ -16,6 +16,7 @@ import {
   FaBrain,
   FaChartBar,
   FaChartLine,
+  FaChevronDown,
   FaCode,
   FaCodeBranch,
   FaCubes,
@@ -114,6 +115,9 @@ const sectionToNavMap = {
   github: '#experience',
   certificates: '#experience',
   certifications: '#experience',
+  // Was missing, so scrolling through testimonials left the highlight stuck on
+  // whichever section preceded it.
+  testimonials: '#experience',
 };
 
 const socialIconMap = {
@@ -450,6 +454,9 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeNav, setActiveNav] = useState('#home');
+  const [activeSection, setActiveSection] = useState('home');
+  const [openMenu, setOpenMenu] = useState(null);
+  const closeMenuTimer = useRef(null);
   const [theme, setTheme] = useState(() => (
     LIGHT_MODE_ENABLED ? localStorage.getItem('theme-v2') || 'dark' : 'dark'
   ));
@@ -563,6 +570,9 @@ function Navbar() {
       const mappedNav = sectionToNavMap[currentSectionId];
       if (mappedNav) {
         setActiveNav(mappedNav);
+        // Kept alongside the mapped nav so the dropdown can show *which* of its five
+        // sections you are in - the parent highlights identically for all of them.
+        setActiveSection(currentSectionId);
       }
     };
 
@@ -586,6 +596,41 @@ function Navbar() {
     }
   }, [closeMobileMenu, location.pathname, navigate]);
 
+  // Closing on mouseleave with no grace period makes the menu feel broken: moving the
+  // cursor diagonally toward a lower item briefly exits the trigger and the panel
+  // vanishes mid-reach. The timer gives that movement room to land.
+  const cancelMenuClose = useCallback(() => {
+    if (closeMenuTimer.current) {
+      window.clearTimeout(closeMenuTimer.current);
+      closeMenuTimer.current = null;
+    }
+  }, []);
+
+  const openMenuNow = useCallback((label) => {
+    cancelMenuClose();
+    setOpenMenu(label);
+  }, [cancelMenuClose]);
+
+  const scheduleMenuClose = useCallback(() => {
+    cancelMenuClose();
+    closeMenuTimer.current = window.setTimeout(() => setOpenMenu(null), 180);
+  }, [cancelMenuClose]);
+
+  useEffect(() => cancelMenuClose, [cancelMenuClose]);
+
+  useEffect(() => {
+    if (!openMenu) {
+      return undefined;
+    }
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setOpenMenu(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [openMenu]);
+
   const renderNavItem = (item, isMobile) => {
     if (item.type === 'route') {
       return (
@@ -602,7 +647,8 @@ function Navbar() {
     }
 
     const isActive = isHome && activeNav === `#${item.section}`;
-    return (
+
+    const anchor = (
       <a
         key={item.to}
         href={item.to}
@@ -614,6 +660,91 @@ function Navbar() {
       >
         <span className="nav-link-label">{item.label}</span>
       </a>
+    );
+
+    if (!item.children) {
+      return anchor;
+    }
+
+    // Mobile has no hover, and burying five links behind another tap would recreate
+    // the discovery problem this exists to solve - so they are simply always shown.
+    if (isMobile) {
+      return (
+        <div key={item.to} className="mobile-nav-group">
+          {anchor}
+          <div className="mobile-subnav">
+            {item.children.map((child) => (
+              <a
+                key={child.section}
+                href={`/#${child.section}`}
+                className={isHome && activeSection === child.section ? 'active-nav' : ''}
+                onClick={(event) => {
+                  event.preventDefault();
+                  goToSection(child.section);
+                }}
+              >
+                {child.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    const menuId = `nav-menu-${item.section}`;
+    const isOpen = openMenu === item.label;
+
+    return (
+      // Trigger and panel share one hover container with no gap between them, so the
+      // cursor never crosses dead space on its way into the menu.
+      <div
+        key={item.to}
+        className="nav-item-group"
+        onMouseEnter={() => openMenuNow(item.label)}
+        onMouseLeave={scheduleMenuClose}
+        onFocus={() => openMenuNow(item.label)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setOpenMenu(null);
+          }
+        }}
+      >
+        {anchor}
+        {/* A disclosure button, not role="menu": menu roles promise arrow-key
+            application semantics we would then owe the user. This also makes the
+            dropdown reachable by keyboard and by tap, which hover alone never is,
+            and the caret is the only visual hint that a menu exists at all. */}
+        <button
+          type="button"
+          className="nav-caret"
+          aria-expanded={isOpen}
+          aria-controls={menuId}
+          aria-label={`${item.label} sections`}
+          onClick={() => setOpenMenu(isOpen ? null : item.label)}
+        >
+          <FaChevronDown aria-hidden="true" />
+        </button>
+
+        {/* `nav-submenu`, not `nav-dropdown`: index.css still carries an unused
+            `.nav-dropdown { position: relative }` from an earlier menu, which would
+            quietly stop this panel positioning absolutely. */}
+        <div id={menuId} className={`nav-submenu ${isOpen ? 'is-open' : ''}`}>
+          {item.children.map((child) => (
+            <a
+              key={child.section}
+              href={`/#${child.section}`}
+              className={isHome && activeSection === child.section ? 'active-nav' : ''}
+              onClick={(event) => {
+                event.preventDefault();
+                setOpenMenu(null);
+                goToSection(child.section);
+              }}
+            >
+              {child.label}
+            </a>
+          ))}
+        </div>
+      </div>
     );
   };
 

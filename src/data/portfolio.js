@@ -1,8 +1,29 @@
 export const navItems = [
   { label: 'Home', to: '/', type: 'anchor', section: 'home' },
   { label: 'About', to: '/#about', type: 'anchor', section: 'about' },
-  { label: 'Experience', to: '/#experience', type: 'anchor', section: 'experience' },
-  { label: 'Projects', to: '/projects', type: 'route' },
+  {
+    label: 'Experience',
+    to: '/#experience',
+    type: 'anchor',
+    section: 'experience',
+    // Five Home sections collapse under this one nav item, so without a dropdown a
+    // visitor who does not scroll the whole page never learns they exist.
+    // `section` values are the real DOM ids - note `certificates`, not
+    // `certifications`, which is what the section actually renders with.
+    children: [
+      { label: 'Experience', section: 'experience' },
+      { label: 'Case Studies', section: 'case-studies' },
+      { label: 'GitHub', section: 'github' },
+      { label: 'Certifications', section: 'certificates' },
+      { label: 'Testimonials', section: 'testimonials' },
+    ],
+  },
+  // Labelled "Brands", not "Projects": this route renders brand cards, the live
+  // profile view and the promotions form - no engineering work. The code projects
+  // are the Case Studies section above. Someone hunting for source who clicked
+  // "Projects" landed here and left. The URL stays /projects on purpose; only the
+  // label changed, so no redirect or sitemap edit is needed.
+  { label: 'Brands', to: '/projects', type: 'route' },
   { label: 'Afterlife', to: '/afterlife', type: 'route' },
   { label: 'Lab', to: '/lab', type: 'route' },
   { label: 'Contact', to: '/contact', type: 'route' },
