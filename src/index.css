@@ -1759,6 +1759,29 @@ iframe {
   flex-direction: column;
 }
 
+/* Title and date share a row, with the date pinned right so it lines up across
+   cards regardless of how many lines the title runs to. */
+.project-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.project-heading h3 {
+  min-width: 0;
+}
+
+.project-period {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
 .project-preview {
   display: flex;
   height: 94px;

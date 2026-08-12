@@ -186,62 +186,60 @@ export const labItems = [
   },
 ];
 
+// Ordered most recent first - CaseStudies paginates straight through the array, so
+// the order here is the order on the page.
+//
+// The descriptions below restate what each project *is*, drawn from its title and
+// stack. They deliberately claim no results, metrics or impact, because none were
+// supplied - anything of that kind has to come from Nilupul rather than be inferred.
 export const projects = [
   {
-    title: 'Venomverse',
-    description: 'Image-based snake, insect, and spider identification app using machine learning models.',
-    tags: ['Flutter', 'Machine Learning', 'Image Classification', 'Firebase'],
-    github: 'https://github.com/PulinduYK/VenomVerseApp',
+    title: 'FaceMark LK',
+    period: 'Present',
+    description:
+      'Privacy-first face attendance system with liveness detection, so a photo or a replayed video cannot be used to mark attendance.',
+    tags: [
+      'Python', 'FastAPI', 'SQLAlchemy', 'OpenCV', 'MediaPipe',
+      'ONNX Runtime', 'ArcFace', 'NumPy', 'React', 'TypeScript', 'Docker',
+    ],
+    github: 'https://github.com/NilupulNishan/liveness-face-attendance-lk',
     live: '',
-    featured: true,
   },
   {
-    title: 'Taxi Booking System',
-    description: 'A software engineering project focused on taxi booking, ride management, and user-friendly transport workflows.',
-    tags: ['Java', 'OOP', 'Database', 'System Design'],
-    github: '',
+    title: 'Log Classification With Hybrid Classification Framework',
+    period: 'June 2025',
+    description:
+      'Log message classifier that combines sentence-embedding models with an LLM served through Groq, exposed over a FastAPI service.',
+    tags: ['Python', 'pandas', 'scikit-learn', 'sentence-transformers', 'FastAPI', 'Groq'],
+    github: 'https://github.com/NilupulNishan/nlp_log_classification',
     live: '',
-    featured: false,
   },
   {
-    title: 'Racketminster Database Project',
-    description: 'A database design coursework project involving conceptual and logical data modeling, enhanced entity-relationship diagrams, and structured data requirements.',
-    tags: ['Database Design', 'EERD', 'SQL', 'Data Modeling'],
-    github: '',
+    title: 'Sales Insight Prediction',
+    period: 'April 2025',
+    description:
+      'Predictive analysis of the Kaggle Superstore dataset, with modelling in scikit-learn and the findings reported through Power BI.',
+    tags: ['Python', 'scikit-learn', 'Pandas', 'Seaborn', 'NumPy', 'Power BI'],
+    github: 'https://github.com/NilupulNishan/Sales-Insight-Prediction',
     live: '',
-    featured: false,
   },
   {
-    title: 'Personal Portfolio',
-    description: 'A personal portfolio website to showcase projects, skills, certifications, and creator collaboration paths.',
-    tags: ['React', 'Vite', 'Tailwind CSS'],
-    github: '',
-    live: 'https://www.nilupulnishan.me/',
-    featured: false,
+    title: 'Analysing and Visualising Wine Data',
+    period: 'Dec 2024',
+    description:
+      'Exploratory analysis and interactive dashboards over a wine dataset, built and presented for PyData Sri Lanka.',
+    tags: ['Python', 'Pandas', 'Plotly Dash', 'Hugging Face', 'Transformers'],
+    github: 'https://github.com/Vimukthixsandeepa/Analyzing-and-Visualizing-Wine-Data',
+    live: '',
   },
   {
-    title: 'No More Hunger SDG Website',
-    description: "An interactive website promoting the UN's Zero Hunger goal through educational web content.",
-    tags: ['HTML', 'CSS', 'JavaScript'],
-    github: '',
+    title: 'WAITER_117',
+    period: 'Nov 2024',
+    description:
+      'Smart waiter robot for restaurant service, driven by an Arduino control loop with IoT connectivity.',
+    tags: ['Arduino', 'PDE Controlling', 'IoT', 'C++'],
+    github: 'https://github.com/NilupulNishan/Waiter_117-v1',
     live: '',
-    featured: false,
-  },
-  {
-    title: 'Plane Seat Management System',
-    description: 'A Java-based private aviation seat reservation and management system.',
-    tags: ['Java', 'OOP', 'Seat Reservation'],
-    github: '',
-    live: '',
-    featured: false,
-  },
-  {
-    title: 'Academic Progression Prediction System',
-    description: "A modular application to predict university students' academic progression from academic input data.",
-    tags: ['Python'],
-    github: '',
-    live: '',
-    featured: false,
   },
 ];
 

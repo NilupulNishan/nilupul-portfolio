@@ -1123,7 +1123,10 @@ function CaseStudies() {
                 <div className="project-preview" aria-hidden="true">
                   <span>{project.title.slice(0, 2)}</span>
                 </div>
-                <h3>{project.title}</h3>
+                <div className="project-heading">
+                  <h3>{project.title}</h3>
+                  {project.period ? <span className="project-period">{project.period}</span> : null}
+                </div>
                 <p>{project.description}</p>
                 <div className="badge-list">
                   {project.tags.map((tag) => (
